@@ -1,0 +1,201 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --safe-area-top: env(safe-area-inset-top);
+  --safe-area-bottom: env(safe-area-inset-bottom);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #0F0F1A;
+  color: white;
+  font-family: var(--font-outfit), sans-serif;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.4); border-radius: 2px; }
+
+/* Leaflet overrides */
+.leaflet-container {
+  background: #0F0F1A !important;
+  font-family: var(--font-outfit) !important;
+}
+
+.leaflet-tile-pane { filter: brightness(0.8) saturate(0.6); }
+
+.custom-marker {
+  background: transparent;
+  border: none;
+}
+
+/* Bottom nav safe area */
+.bottom-nav {
+  padding-bottom: max(16px, var(--safe-area-bottom));
+}
+
+/* Page transitions */
+.page-enter {
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* QR scanner */
+.scanner-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+}
+
+.scanner-window {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  width: 260px;
+  height: 260px;
+  border: 2px solid rgba(124, 58, 237, 0.8);
+  border-radius: 16px;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.6);
+}
+
+.scanner-corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: #7C3AED;
+  border-style: solid;
+}
+
+.scanner-corner-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+.scanner-corner-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+.scanner-corner-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+.scanner-corner-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #7C3AED, transparent);
+  animation: scanLine 2s ease-in-out infinite;
+}
+
+@keyframes scanLine {
+  0% { top: 0; }
+  50% { top: calc(100% - 2px); }
+  100% { top: 0; }
+}
+
+/* Progress bar */
+.progress-bar {
+  background: linear-gradient(90deg, #7C3AED, #3B82F6);
+  border-radius: 4px;
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Glass card */
+.glass {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Pulse glow */
+.glow-brand {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+}
+
+/* Input */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="tel"] {
+  outline: none;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: white;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 16px;
+  width: 100%;
+  font-family: var(--font-outfit);
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  border-color: rgba(124, 58, 237, 0.6);
+}
+
+input::placeholder {
+  color: rgba(255,255,255,0.3);
+}
+
+/* OTP inputs */
+.otp-input {
+  width: 52px;
+  height: 60px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  font-family: var(--font-syne);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  color: white;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.otp-input:focus {
+  border-color: #7C3AED;
+  background: rgba(124, 58, 237, 0.1);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+/* Button */
+.btn-primary {
+  background: linear-gradient(135deg, #7C3AED, #3B82F6);
+  color: white;
+  font-weight: 600;
+  padding: 14px 24px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-family: var(--font-outfit);
+  transition: opacity 0.2s, transform 0.1s;
+  width: 100%;
+  display: block;
+}
+
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Noise texture overlay */
+.noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
+}
