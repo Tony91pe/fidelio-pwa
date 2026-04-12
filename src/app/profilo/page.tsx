@@ -6,10 +6,12 @@ import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { getShops } from '@/lib/api'
 import { CustomerShop } from '@/types'
+import { usePushNotifications } from '@/hooks/usePushNotifications'
 
 export default function ProfiloPage() {
   const { customer, logout } = useAuthStore()
   const router = useRouter()
+  const { permission, subscribed, subscribe } = usePushNotifications()
 
   const { data: shops = [] } = useQuery({
     queryKey: ['customer-shops', customer?.email],
@@ -57,7 +59,7 @@ export default function ProfiloPage() {
         </div>
 
         {/* Menu */}
-        <div className="flex flex-col gap-2 mb-8">
+        <div className="flex flex-col gap-2 mb-4">
           {[
             { label: 'I miei negozi', emoji: '🏪', href: '/' },
             { label: 'I miei premi', emoji: '🏆', href: '/premi' },
@@ -73,6 +75,29 @@ export default function ProfiloPage() {
               <span className="text-white/20">→</span>
             </button>
           ))}
+        </div>
+
+        {/* Notifiche */}
+        <div className="glass rounded-xl p-4 mb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-sm">🔔 Notifiche push</p>
+              <p className="text-white/40 text-xs mt-0.5">
+                {subscribed ? 'Attive — ricevi aggiornamenti sui punti' : 'Ricevi notifiche quando guadagni punti'}
+              </p>
+            </div>
+            {!subscribed && permission !== 'denied' && (
+              <button
+                onClick={subscribe}
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg"
+                style={{ background: 'rgba(124,58,237,0.3)', color: '#A78BFA' }}
+              >
+                Attiva
+              </button>
+            )}
+            {subscribed && <span className="text-xs font-semibold" style={{ color: '#10B981' }}>✓ Attive</span>}
+            {permission === 'denied' && <span className="text-xs" style={{ color: '#EF4444' }}>Bloccate</span>}
+          </div>
         </div>
 
         {/* Logout */}
