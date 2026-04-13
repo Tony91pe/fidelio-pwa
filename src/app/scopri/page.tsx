@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getAllShops } from '@/lib/api'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
@@ -70,6 +70,16 @@ export default function ScopriPage() {
       s.category.toLowerCase().includes(search.toLowerCase())
   )
 
+  // Quando la ricerca trova un solo negozio, selezionalo automaticamente
+  useEffect(() => {
+    if (search.length > 1 && filtered.length === 1) {
+      setSelectedShop(filtered[0])
+      setView('map')
+    } else if (search.length === 0) {
+      setSelectedShop(null)
+    }
+  }, [search, filtered.length])
+
   function handleGPS() {
     if (!navigator.geolocation) return
     setLocating(true)
@@ -126,6 +136,29 @@ export default function ScopriPage() {
               </button>
             </div>
           </div>
+
+          {/* Risultati ricerca */}
+          {search.length > 1 && filtered.length > 0 && view === 'map' && (
+            <div className="rounded-xl overflow-hidden mb-1" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              {filtered.slice(0, 4).map((shop) => {
+                const cfg = getCategoryConfig(shop.category)
+                return (
+                  <button
+                    key={shop.id}
+                    onClick={() => { handleSelectShop(shop); setSearch('') }}
+                    className="flex items-center gap-3 p-3 w-full text-left"
+                    style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+                  >
+                    <span className="text-lg">{cfg.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm truncate">{shop.name}</p>
+                      <p className="text-xs text-white/40 truncate">{shop.city}</p>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         {view === 'map' ? (
