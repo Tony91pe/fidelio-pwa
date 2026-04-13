@@ -8,12 +8,14 @@ interface Props {
   shops: Shop[]
   selectedShop: Shop | null
   onSelectShop: (shop: Shop) => void
+  userLocation?: { lat: number; lng: number } | null
 }
 
-export default function MapComponent({ shops, selectedShop, onSelectShop }: Props) {
+export default function MapComponent({ shops, selectedShop, onSelectShop, userLocation }: Props) {
   const mapRef = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const markersRef = useRef<any[]>([])
+  const userMarkerRef = useRef<any>(null)
   const initializedRef = useRef(false)
 
   useEffect(() => {
@@ -56,12 +58,9 @@ export default function MapComponent({ shops, selectedShop, onSelectShop }: Prop
     if (!shops.length) return
 
     const addMarkers = () => {
-      if (!mapRef.current) {
-        setTimeout(addMarkers, 200)
-        return
-      }
-
+      if (!mapRef.current) { setTimeout(addMarkers, 200); return }
       const { map, L } = mapRef.current
+
       markersRef.current.forEach((m) => m.remove())
       markersRef.current = []
 
@@ -82,6 +81,7 @@ export default function MapComponent({ shops, selectedShop, onSelectShop }: Prop
             display:flex;align-items:center;justify-content:center;
             font-size:${isSelected ? '20px' : '16px'};
             box-shadow:0 4px 12px ${cfg.color}66;
+            cursor:pointer;
           ">${cfg.emoji}</div>`,
           iconSize: [isSelected ? 48 : 38, isSelected ? 48 : 38],
           iconAnchor: [isSelected ? 24 : 19, isSelected ? 24 : 19],
@@ -94,19 +94,40 @@ export default function MapComponent({ shops, selectedShop, onSelectShop }: Prop
         markersRef.current.push(marker)
       })
 
-      if (shopsWithCoords.length > 0 && !selectedShop) {
+      if (shopsWithCoords.length > 0 && !selectedShop && !userLocation) {
         const bounds = L.latLngBounds(shopsWithCoords.map((s) => [s.lat!, s.lng!]))
         map.fitBounds(bounds, { padding: [40, 40] })
       }
     }
 
     addMarkers()
-  }, [shops, selectedShop, onSelectShop])
+  }, [shops, selectedShop, onSelectShop, userLocation])
 
   useEffect(() => {
     if (!mapRef.current || !selectedShop?.lat || !selectedShop?.lng) return
     mapRef.current.map.flyTo([selectedShop.lat, selectedShop.lng], 15, { duration: 0.8 })
   }, [selectedShop])
+
+  useEffect(() => {
+    if (!mapRef.current || !userLocation) return
+    const { map, L } = mapRef.current
+
+    if (userMarkerRef.current) userMarkerRef.current.remove()
+
+    const icon = L.divIcon({
+      className: 'custom-marker',
+      html: `<div style="
+        width:20px;height:20px;border-radius:50%;
+        background:#3B82F6;border:3px solid white;
+        box-shadow:0 0 0 4px rgba(59,130,246,0.3);
+      "></div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    })
+
+    userMarkerRef.current = L.marker([userLocation.lat, userLocation.lng], { icon }).addTo(map)
+    map.flyTo([userLocation.lat, userLocation.lng], 13, { duration: 1 })
+  }, [userLocation])
 
   return <div ref={containerRef} className="w-full h-full" />
 }

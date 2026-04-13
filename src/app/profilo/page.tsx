@@ -11,7 +11,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications'
 export default function ProfiloPage() {
   const { customer, logout } = useAuthStore()
   const router = useRouter()
-  const { permission, subscribed, subscribe } = usePushNotifications()
+  const { permission, subscribed, subscribe, unsubscribe } = usePushNotifications()
 
   const { data: shops = [] } = useQuery({
     queryKey: ['customer-shops', customer?.email],
@@ -37,20 +37,18 @@ export default function ProfiloPage() {
   return (
     <ProtectedLayout>
       <div className="page-enter px-4 pt-6 pb-4">
-        {/* Avatar */}
         <div className="flex flex-col items-center mb-8 pt-4">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-brand to-blue-500 flex items-center justify-center mb-4 glow-brand">
-            <span className="font-display font-black text-3xl">{customer?.name?.[0]?.toUpperCase() || 'C'}</span>
+          <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-4" style={{ background: 'linear-gradient(135deg, #7C3AED, #3B82F6)', boxShadow: '0 0 20px rgba(124,58,237,0.4)' }}>
+            <span className="font-display font-black text-3xl text-white">{customer?.name?.[0]?.toUpperCase() || 'C'}</span>
           </div>
           <h1 className="font-display font-bold text-2xl">{customer?.name}</h1>
           <p className="text-white/40 text-sm mt-0.5">{customer?.email}</p>
           <div className="font-mono text-xs text-white/30 mt-1 tracking-widest">{customer?.code}</div>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           {stats.map((stat) => (
-            <div key={stat.label} className="glass rounded-2xl p-4 text-center">
+            <div key={stat.label} className="rounded-2xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <p className="text-2xl mb-1">{stat.emoji}</p>
               <p className="font-display font-black text-xl">{stat.value}</p>
               <p className="text-white/40 text-[10px]">{stat.label}</p>
@@ -58,7 +56,6 @@ export default function ProfiloPage() {
           ))}
         </div>
 
-        {/* Menu */}
         <div className="flex flex-col gap-2 mb-4">
           {[
             { label: 'I miei negozi', emoji: '🏪', href: '/' },
@@ -68,7 +65,8 @@ export default function ProfiloPage() {
             <button
               key={item.label}
               onClick={() => router.push(item.href)}
-              className="glass rounded-xl p-4 flex items-center gap-3 w-full text-left hover:bg-white/5 transition-colors"
+              className="rounded-xl p-4 flex items-center gap-3 w-full text-left transition-colors"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
               <span className="text-xl">{item.emoji}</span>
               <span className="font-medium text-sm flex-1">{item.label}</span>
@@ -77,8 +75,7 @@ export default function ProfiloPage() {
           ))}
         </div>
 
-        {/* Notifiche */}
-        <div className="glass rounded-xl p-4 mb-4">
+        <div className="rounded-xl p-4 mb-4" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium text-sm">🔔 Notifiche push</p>
@@ -86,7 +83,17 @@ export default function ProfiloPage() {
                 {subscribed ? 'Attive — ricevi aggiornamenti sui punti' : 'Ricevi notifiche quando guadagni punti'}
               </p>
             </div>
-            {!subscribed && permission !== 'denied' && (
+            {subscribed ? (
+              <button
+                onClick={unsubscribe}
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg"
+                style={{ background: 'rgba(239,68,68,0.15)', color: '#EF4444' }}
+              >
+                Disattiva
+              </button>
+            ) : permission === 'denied' ? (
+              <span className="text-xs" style={{ color: '#EF4444' }}>Bloccate</span>
+            ) : (
               <button
                 onClick={subscribe}
                 className="text-xs font-semibold px-3 py-1.5 rounded-lg"
@@ -95,16 +102,13 @@ export default function ProfiloPage() {
                 Attiva
               </button>
             )}
-            {subscribed && <span className="text-xs font-semibold" style={{ color: '#10B981' }}>✓ Attive</span>}
-            {permission === 'denied' && <span className="text-xs" style={{ color: '#EF4444' }}>Bloccate</span>}
           </div>
         </div>
 
-        {/* Logout */}
         <button
           onClick={handleLogout}
-          className="w-full py-4 rounded-xl text-danger font-semibold text-sm"
-          style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}
+          className="w-full py-4 rounded-xl font-semibold text-sm"
+          style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }}
         >
           Esci dall'account
         </button>
