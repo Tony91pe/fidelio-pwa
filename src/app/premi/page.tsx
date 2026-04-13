@@ -27,7 +27,7 @@ export default function PremiPage() {
 
   return (
     <ProtectedLayout>
-      <div className="page-enter px-4 pt-14 pb-4">
+      <div className="page-enter px-4 pt-6 pb-4">
         <h1 className="font-display font-bold text-2xl mb-6">Premi</h1>
 
         {/* Tabs */}

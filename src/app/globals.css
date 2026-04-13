@@ -21,6 +21,7 @@ body {
   color: white;
   font-family: var(--font-outfit), sans-serif;
   min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
   overflow-x: hidden;
 }
 

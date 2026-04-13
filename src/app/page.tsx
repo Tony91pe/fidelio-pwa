@@ -97,7 +97,7 @@ export default function HomePage() {
 
   return (
     <ProtectedLayout>
-      <div className="page-enter px-4 pt-14 pb-4">
+      <div className="page-enter px-4 pt-6 pb-4">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>

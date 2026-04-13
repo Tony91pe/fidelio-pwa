@@ -116,7 +116,7 @@ export default function ScanPage() {
     <ProtectedLayout>
       <div className="page-enter flex flex-col min-h-[calc(100dvh-80px)]">
         {/* Tabs */}
-        <div className="px-4 pt-14 pb-4">
+        <div className="px-4 pt-6 pb-4">
           <div className="flex glass rounded-xl p-1">
             <button
               onClick={() => setMode('show')}

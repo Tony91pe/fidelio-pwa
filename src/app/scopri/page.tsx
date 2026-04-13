@@ -58,7 +58,7 @@ export default function ScopriPage() {
     <ProtectedLayout>
       <div className="flex flex-col h-dvh pb-20">
         {/* Header */}
-        <div className="px-4 pt-14 pb-3 flex-shrink-0">
+        <div className="px-4 pt-6 pb-3 flex-shrink-0">
           <h1 className="font-display font-bold text-2xl mb-3">Scopri</h1>
           <div className="flex gap-2 mb-3">
             <input

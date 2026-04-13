@@ -36,7 +36,7 @@ export default function ProfiloPage() {
 
   return (
     <ProtectedLayout>
-      <div className="page-enter px-4 pt-14 pb-4">
+      <div className="page-enter px-4 pt-6 pb-4">
         {/* Avatar */}
         <div className="flex flex-col items-center mb-8 pt-4">
           <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-brand to-blue-500 flex items-center justify-center mb-4 glow-brand">
