@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getAllShops } from '@/lib/api'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
@@ -20,30 +20,53 @@ const MapComponent = dynamic(() => import('@/components/MapComponent'), {
 
 function ShopDetail({ shop, onClose }: { shop: Shop; onClose: () => void }) {
   const cfg = getCategoryConfig(shop.category)
-  return (
-    <div className="absolute bottom-4 left-4 right-4 animate-slide-up" style={{ background: 'rgba(22,22,42,0.97)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '16px', backdropFilter: 'blur(20px)' }}>
+  const [detail, setDetail] = React.useState<any>(null)
+  React.useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/app/shops/${shop.id}`)
+      .then(r => r.json()).then(setDetail).catch(() => {})
+  }, [shop.id])
+  const s = detail ?? shop
+return (
+    <div className="absolute bottom-4 left-4 right-4 animate-slide-up" style={{ background: 'rgba(22,22,42,0.97)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '16px', backdropFilter: 'blur(20px)', maxHeight: '60vh', overflowY: 'auto' }}>
       <div className="flex items-start gap-3">
-        <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: cfg.color + '22' }}>
-          {cfg.emoji}
+        <div className="flex-shrink-0">
+          {s.logo
+            ? <img src={s.logo} alt={s.name} style={{ width: 56, height: 56, borderRadius: 12, objectFit: 'cover' }} />
+            : <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl" style={{ background: cfg.color + '22' }}>{cfg.emoji}</div>
+          }
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-base truncate">{shop.name}</p>
-          <p className="text-xs text-white/40 truncate mt-0.5">{shop.address}, {shop.city}</p>
-          {shop.phone && <p className="text-xs text-white/40 mt-0.5">📞 {shop.phone}</p>}
+          <p className="font-bold text-base truncate">{s.name}</p>
+          <p className="text-xs text-white/40 truncate mt-0.5">{s.address}, {s.city}</p>
+          {s.phone && <p className="text-xs text-white/40 mt-0.5">📞 {s.phone}</p>}
+          {s.description && <p className="text-xs text-white/60 mt-1 line-clamp-2">{s.description}</p>}
           <div className="mt-2 flex items-center gap-2">
             <span className="text-xs px-2 py-0.5 rounded-lg font-medium" style={{ background: cfg.color + '22', color: cfg.color }}>{cfg.label}</span>
-            <span className="text-xs text-white/50">{shop.rewardDescription} ogni {shop.rewardThreshold} punti</span>
+            <span className="text-xs text-white/50">{s.rewardDescription} ogni {s.rewardThreshold} punti</span>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
             <div className="rounded-lg p-2 text-center" style={{ background: 'rgba(255,255,255,0.06)' }}>
               <p className="text-white/40">Punti per visita</p>
-              <p className="font-bold text-white">{shop.pointsPerVisit}</p>
+              <p className="font-bold text-white">{s.pointsPerVisit}</p>
             </div>
             <div className="rounded-lg p-2 text-center" style={{ background: 'rgba(255,255,255,0.06)' }}>
               <p className="text-white/40">Premio a</p>
-              <p className="font-bold text-white">{shop.rewardThreshold} pt</p>
+              <p className="font-bold text-white">{s.rewardThreshold} pt</p>
             </div>
           </div>
+          {detail?.rewards?.length > 0 && (
+            <div className="mt-3">
+              <p className="text-xs text-white/40 mb-1">🎁 Premi disponibili</p>
+              <div className="flex flex-col gap-1">
+                {detail.rewards.map((r: any) => (
+                  <div key={r.id} className="flex justify-between items-center rounded-lg px-2 py-1.5" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <span className="text-xs text-white">{r.title}</span>
+                    <span className="text-xs font-bold" style={{ color: cfg.color }}>{r.pointsCost} pt</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <button onClick={onClose} className="text-white/30 text-2xl leading-none flex-shrink-0">×</button>
       </div>
