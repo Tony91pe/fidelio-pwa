@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getAllShops } from '@/lib/api'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
 import { getCategoryConfig } from '@/lib/categories'
+import { getCityCoordinates } from '@/lib/cities'
 import { Shop } from '@/types'
 import dynamic from 'next/dynamic'
 
@@ -56,6 +57,8 @@ export default function ScopriPage() {
   const [view, setView] = useState<'map' | 'list'>('map')
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [locating, setLocating] = useState(false)
+  const [centerCity, setCenterCity] = useState<{ lat: number; lng: number } | null>(null)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
 
   const { data: shops = [], isLoading } = useQuery({
     queryKey: ['all-shops'],
@@ -64,10 +67,16 @@ export default function ScopriPage() {
   })
 
   const filtered = shops.filter(
-    (s) =>
-      s.name.toLowerCase().includes(search.toLowerCase()) ||
-      s.city.toLowerCase().includes(search.toLowerCase()) ||
-      s.category.toLowerCase().includes(search.toLowerCase())
+    (s) => {
+      const matchesSearch =
+        s.name.toLowerCase().includes(search.toLowerCase()) ||
+        s.city.toLowerCase().includes(search.toLowerCase()) ||
+        s.category.toLowerCase().includes(search.toLowerCase())
+
+      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(s.category)
+
+      return matchesSearch && matchesCategory
+    }
   )
 
   // Quando la ricerca trova un solo negozio, selezionalo automaticamente
@@ -77,6 +86,18 @@ export default function ScopriPage() {
       setView('map')
     } else if (search.length === 0) {
       setSelectedShop(null)
+      setCenterCity(null)
+    } else if (filtered.length === 0 && search.length > 1) {
+      // Provare a cercare una città conosciuta
+      const cityCoords = getCityCoordinates(search)
+      if (cityCoords) {
+        setCenterCity(cityCoords)
+        setView('map')
+      } else {
+        setCenterCity(null)
+      }
+    } else {
+      setCenterCity(null)
     }
   }, [search, filtered.length])
 
@@ -104,20 +125,33 @@ export default function ScopriPage() {
         <div className="px-4 pt-6 pb-3 flex-shrink-0">
           <h1 className="font-display font-bold text-2xl mb-3">Scopri</h1>
           <div className="flex gap-2 mb-3">
-            <input
-              type="text"
-              placeholder="Cerca negozi, città..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ flex: 1 }}
-            />
+            <div className="flex-1 flex items-center gap-2 px-4 py-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)' }}>
+              <span>🔍</span>
+              <input
+                type="text"
+                placeholder="Cerca negozi, città..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                autoComplete="off"
+                className="flex-1 bg-transparent outline-none text-white"
+                style={{ fontSize: '16px', fontFamily: 'inherit' }}
+              />
+            </div>
             <button
               onClick={handleGPS}
               disabled={locating}
-              className="px-3 rounded-xl flex-shrink-0"
-              style={{ background: userLocation ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: userLocation ? '#10B981' : 'rgba(255,255,255,0.6)' }}
+              title={locating ? 'Localizzazione in corso...' : userLocation ? 'Localizzazione trovata' : 'Cerca la tua posizione'}
+              className="px-3 rounded-xl flex-shrink-0 transition-all"
+              style={{
+                background: userLocation ? 'rgba(16,185,129,0.2)' : locating ? 'rgba(124,58,237,0.2)' : 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: userLocation ? '#10B981' : locating ? '#A78BFA' : 'rgba(255,255,255,0.6)',
+                cursor: locating ? 'loading' : 'pointer',
+                fontSize: '18px',
+                padding: '10px'
+              }}
             >
-              {locating ? '⏳' : '📍'}
+              {locating ? '⏳' : userLocation ? '✅' : '📍'}
             </button>
             <div className="flex rounded-xl overflow-hidden flex-shrink-0" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
               <button
@@ -135,6 +169,34 @@ export default function ScopriPage() {
                 ☰
               </button>
             </div>
+          </div>
+
+          {/* Filtri categoria */}
+          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+            {['bar', 'pizzeria', 'ristorante', 'parrucchiere', 'estetista', 'palestra', 'farmacia', 'negozio', 'supermercato'].map((category) => {
+              const cfg = getCategoryConfig(category)
+              const isSelected = selectedCategories.includes(category)
+              return (
+                <button
+                  key={category}
+                  onClick={() => {
+                    setSelectedCategories(prev =>
+                      prev.includes(category)
+                        ? prev.filter(c => c !== category)
+                        : [...prev, category]
+                    )
+                  }}
+                  className="flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap"
+                  style={{
+                    background: isSelected ? cfg.color : 'rgba(255,255,255,0.06)',
+                    color: isSelected ? 'white' : 'rgba(255,255,255,0.6)',
+                    border: isSelected ? 'none' : '1px solid rgba(255,255,255,0.1)'
+                  }}
+                >
+                  {cfg.emoji} {cfg.label}
+                </button>
+              )
+            })}
           </div>
 
           {/* Risultati ricerca */}
@@ -168,6 +230,7 @@ export default function ScopriPage() {
               selectedShop={selectedShop}
               onSelectShop={setSelectedShop}
               userLocation={userLocation}
+              centerCity={centerCity}
             />
             {selectedShop && (
               <ShopDetail shop={selectedShop} onClose={() => setSelectedShop(null)} />

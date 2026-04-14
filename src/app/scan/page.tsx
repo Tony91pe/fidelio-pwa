@@ -95,9 +95,21 @@ export default function ScanPage() {
         // Vibrate feedback
         if (navigator.vibrate) navigator.vibrate(200)
 
-        // If it looks like a Fidelio shop QR, redirect to checkin
+        // If it looks like a Fidelio shop QR, open in popup
         if (text.startsWith('http') && text.includes('/checkin/')) {
-          setTimeout(() => window.location.href = text, 800)
+          const popup = window.open(text, 'checkin', 'width=500,height=600')
+
+          // Monitora quando il popup si chiude
+          const checkPopup = setInterval(() => {
+            if (popup?.closed) {
+              clearInterval(checkPopup)
+              // Ricarica i dati dell'utente dopo il checkin
+              setTimeout(() => {
+                setResult('')
+                setMode('show')
+              }, 1000)
+            }
+          }, 500)
         }
         return
       }

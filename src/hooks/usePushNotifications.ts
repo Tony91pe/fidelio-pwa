@@ -18,6 +18,8 @@ export function usePushNotifications() {
   const { customer } = useAuthStore()
   const [permission, setPermission] = useState<NotificationPermission>('default')
   const [subscribed, setSubscribed] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -29,44 +31,59 @@ export function usePushNotifications() {
   async function subscribe() {
     if (!customer?.email) return
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return
+    setLoading(true)
+    setError('')
     try {
       const perm = await Notification.requestPermission()
       setPermission(perm)
-      if (perm !== 'granted') return
+      if (perm !== 'granted') {
+        setError('Permesso non concesso')
+        return
+      }
       const reg = await navigator.serviceWorker.ready
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
       })
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/customer/push`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/customer/push`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: customer.email, subscription: sub.toJSON() }),
       })
+      if (!response.ok) throw new Error('Errore server')
       setSubscribed(true)
     } catch (err) {
       console.error('Push subscription error:', err)
+      setError('Errore durante l\'attivazione')
+    } finally {
+      setLoading(false)
     }
   }
 
   async function unsubscribe() {
     if (!('serviceWorker' in navigator)) return
+    setLoading(true)
+    setError('')
     try {
       const reg = await navigator.serviceWorker.ready
       const sub = await reg.pushManager.getSubscription()
       if (sub) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/customer/push`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/customer/push`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ endpoint: sub.endpoint }),
         })
+        if (!response.ok) throw new Error('Errore server')
         await sub.unsubscribe()
       }
       setSubscribed(false)
     } catch (err) {
       console.error('Push unsubscribe error:', err)
+      setError('Errore durante la disattivazione')
+    } finally {
+      setLoading(false)
     }
   }
 
-  return { permission, subscribed, subscribe, unsubscribe }
+  return { permission, subscribed, subscribe, unsubscribe, loading, error }
 }

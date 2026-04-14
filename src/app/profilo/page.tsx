@@ -11,7 +11,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications'
 export default function ProfiloPage() {
   const { customer, logout } = useAuthStore()
   const router = useRouter()
-  const { permission, subscribed, subscribe, unsubscribe } = usePushNotifications()
+  const { permission, subscribed, subscribe, unsubscribe, loading, error } = usePushNotifications()
 
   const { data: shops = [] } = useQuery({
     queryKey: ['customer-shops', customer?.email],
@@ -77,29 +77,32 @@ export default function ProfiloPage() {
 
         <div className="rounded-xl p-4 mb-4" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1">
               <p className="font-medium text-sm">🔔 Notifiche push</p>
               <p className="text-white/40 text-xs mt-0.5">
                 {subscribed ? 'Attive — ricevi aggiornamenti sui punti' : 'Ricevi notifiche quando guadagni punti'}
               </p>
+              {error && <p className="text-xs" style={{ color: '#EF4444' }}>{error}</p>}
             </div>
             {subscribed ? (
               <button
                 onClick={unsubscribe}
-                className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-                style={{ background: 'rgba(239,68,68,0.15)', color: '#EF4444' }}
+                disabled={loading}
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-opacity"
+                style={{ background: 'rgba(239,68,68,0.15)', color: '#EF4444', opacity: loading ? 0.5 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
               >
-                Disattiva
+                {loading ? '⏳' : 'Disattiva'}
               </button>
             ) : permission === 'denied' ? (
               <span className="text-xs" style={{ color: '#EF4444' }}>Bloccate</span>
             ) : (
               <button
                 onClick={subscribe}
-                className="text-xs font-semibold px-3 py-1.5 rounded-lg"
-                style={{ background: 'rgba(124,58,237,0.3)', color: '#A78BFA' }}
+                disabled={loading}
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-opacity"
+                style={{ background: 'rgba(124,58,237,0.3)', color: '#A78BFA', opacity: loading ? 0.5 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
               >
-                Attiva
+                {loading ? '⏳' : 'Attiva'}
               </button>
             )}
           </div>

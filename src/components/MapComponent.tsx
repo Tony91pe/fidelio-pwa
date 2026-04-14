@@ -9,9 +9,10 @@ interface Props {
   selectedShop: Shop | null
   onSelectShop: (shop: Shop) => void
   userLocation?: { lat: number; lng: number } | null
+  centerCity?: { lat: number; lng: number } | null
 }
 
-export default function MapComponent({ shops, selectedShop, onSelectShop, userLocation }: Props) {
+export default function MapComponent({ shops, selectedShop, onSelectShop, userLocation, centerCity }: Props) {
   const mapRef = useRef<any>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const markersRef = useRef<any[]>([])
@@ -82,31 +83,42 @@ export default function MapComponent({ shops, selectedShop, onSelectShop, userLo
             font-size:${isSelected ? '20px' : '16px'};
             box-shadow:0 4px 12px ${cfg.color}66;
             cursor:pointer;
+            pointer-events:auto;
+            user-select:none;
+            z-index:1000;
           ">${cfg.emoji}</div>`,
           iconSize: [isSelected ? 48 : 38, isSelected ? 48 : 38],
           iconAnchor: [isSelected ? 24 : 19, isSelected ? 24 : 19],
+          popupAnchor: [0, -isSelected ? 24 : 19],
         })
 
-        const marker = L.marker([shop.lat!, shop.lng!], { icon })
+        const marker = L.marker([shop.lat!, shop.lng!], { icon, zIndexOffset: 1000 })
           .addTo(map)
-          .on('click', () => onSelectShop(shop))
+          .on('click', () => {
+            onSelectShop(shop)
+          })
 
         markersRef.current.push(marker)
       })
 
-      if (shopsWithCoords.length > 0 && !selectedShop && !userLocation) {
+      if (shopsWithCoords.length > 0 && !selectedShop) {
         const bounds = L.latLngBounds(shopsWithCoords.map((s) => [s.lat!, s.lng!]))
         map.fitBounds(bounds, { padding: [40, 40] })
       }
     }
 
     addMarkers()
-  }, [shops, selectedShop, onSelectShop, userLocation])
+  }, [shops, onSelectShop])
 
   useEffect(() => {
     if (!mapRef.current || !selectedShop?.lat || !selectedShop?.lng) return
     mapRef.current.map.flyTo([selectedShop.lat, selectedShop.lng], 15, { duration: 0.8 })
   }, [selectedShop])
+
+  useEffect(() => {
+    if (!mapRef.current || !centerCity) return
+    mapRef.current.map.flyTo([centerCity.lat, centerCity.lng], 12, { duration: 0.8 })
+  }, [centerCity])
 
   useEffect(() => {
     if (!mapRef.current || !userLocation) return

@@ -59,3 +59,6 @@ export const getGiftCards = (email: string) =>
   api.get('/api/customer/giftcards', { params: { email } })
 
 export default api
+
+export const getShopById = (id: string) =>
+  api.get(`/api/app/shops/${id}`)
