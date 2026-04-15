@@ -58,6 +58,11 @@ export default function LoginPage() {
     try {
       const res = await verifyOTP(email, code)
       setAuth(res.data.token, res.data.customer)
+      if (res.data.isNewUser) {
+        router.replace("/onboarding")
+      } else {
+        router.replace("/")
+      }
       router.replace('/')
     } catch (err) {
       if (axios.isAxiosError(err)) {

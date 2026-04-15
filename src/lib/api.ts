@@ -62,3 +62,6 @@ export default api
 
 export const getShopById = (id: string) =>
   api.get(`/api/app/shops/${id}`)
+
+export const updateCustomer = (data: { name?: string; birthday?: string }, token: string) =>
+  api.post('/api/app/customer/update', data, { headers: { Authorization: `Bearer ${token}` } })

@@ -6,6 +6,7 @@ export interface Customer {
   points: number
   totalVisits: number
   lastVisitAt: string | null
+  birthday: string | null
 }
 
 export interface Shop {
