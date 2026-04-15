@@ -7,45 +7,58 @@ import { getShops } from '@/lib/api'
 import { getCategoryConfig } from '@/lib/categories'
 import { CustomerShop } from '@/types'
 
-function OfferCard({ shop }: { shop: CustomerShop }) {
+function OfferCard({ shop, index }: { shop: CustomerShop; index: number }) {
   const cfg = getCategoryConfig(shop.category)
-  const remaining = Math.max(shop.nextRewardPoints - shop.points, 0)
   const pct = Math.min((shop.points / shop.nextRewardPoints) * 100, 100)
+  const remaining = Math.max(shop.nextRewardPoints - shop.points, 0)
   const isClose = pct >= 80
+  const isReady = remaining === 0
 
   return (
-    <div className="glass rounded-2xl overflow-hidden">
-      <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, ${cfg.color} ${pct}%, rgba(255,255,255,0.06) ${pct}%)` }} />
+    <div
+      className="relative rounded-2xl overflow-hidden"
+      style={{
+        background: 'rgba(255,255,255,0.035)',
+        border: `1px solid ${isReady ? 'rgba(52,211,153,0.3)' : isClose ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.07)'}`,
+        animation: `slideUp 0.4s cubic-bezier(0.16,1,0.3,1) ${index * 0.07}s both`,
+      }}
+    >
+      {/* Progress bar top */}
+      <div className="h-0.5 w-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
+        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: isReady ? '#34D399' : isClose ? '#F59E0B' : cfg.color }} />
+      </div>
+
       <div className="p-4">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: cfg.color + '22' }}>
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: cfg.color + '1A', border: `1px solid ${cfg.color}33` }}>
             {cfg.emoji}
           </div>
-          <div className="flex-1">
-            <p className="font-semibold text-sm">{shop.shopName}</p>
-            <p className="text-xs text-white/40">{cfg.label}</p>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm truncate">{shop.shopName}</p>
+            <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{cfg.label}</p>
           </div>
-          {isClose && (
-            <span className="text-xs px-2 py-0.5 rounded-lg font-medium" style={{ background: 'rgba(245,158,11,0.2)', color: '#F59E0B' }}>
-              Quasi!
-            </span>
-          )}
+          {isReady ? (
+            <span className="text-xs px-2.5 py-1 rounded-lg font-semibold" style={{ background: 'rgba(52,211,153,0.15)', color: '#34D399' }}>Pronto!</span>
+          ) : isClose ? (
+            <span className="text-xs px-2.5 py-1 rounded-lg font-semibold" style={{ background: 'rgba(245,158,11,0.15)', color: '#F59E0B' }}>Quasi!</span>
+          ) : null}
         </div>
 
-        <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-          <p className="text-xs text-white/40 mb-0.5">Premio disponibile</p>
+        <div className="rounded-xl p-3 mb-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
+          <p className="text-[10px] font-medium mb-0.5" style={{ color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Premio</p>
           <p className="font-semibold text-sm">{shop.rewardDescription || 'Premio speciale'}</p>
         </div>
 
-        <div className="flex justify-between items-center mt-3 text-xs">
-          <span className="text-white/40">
-            {shop.points} / {shop.nextRewardPoints} punti
-          </span>
-          {remaining > 0 ? (
-            <span className="text-white/60">Mancano {remaining} punti</span>
-          ) : (
-            <span className="text-success font-semibold">🎉 Premio disponibile!</span>
-          )}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <div className="h-1 rounded-full overflow-hidden flex-1" style={{ width: 80, background: 'rgba(255,255,255,0.06)' }}>
+              <div className="h-full rounded-full" style={{ width: `${pct}%`, background: isReady ? '#34D399' : cfg.color }} />
+            </div>
+            <p className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.4)' }}>{Math.round(pct)}%</p>
+          </div>
+          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            {isReady ? '🎉 Vai al negozio!' : `${shop.points} / ${shop.nextRewardPoints} pt`}
+          </p>
         </div>
       </div>
     </div>
@@ -59,55 +72,64 @@ export default function OffertePage() {
     queryKey: ['customer-shops', customer?.email],
     queryFn: () => getShops(),
     enabled: !!customer?.email,
-    select: (res) => (res.data as CustomerShop[]).sort((a, b) => {
-      const pctA = a.points / a.nextRewardPoints
-      const pctB = b.points / b.nextRewardPoints
-      return pctB - pctA
-    }),
+    select: (res) => (res.data as CustomerShop[]).sort((a, b) => (b.points / b.nextRewardPoints) - (a.points / a.nextRewardPoints)),
   })
 
-  const closeShops = shops.filter((s) => (s.points / s.nextRewardPoints) >= 0.8)
+  const readyShops = shops.filter((s) => s.points >= s.nextRewardPoints)
+  const closeShops = shops.filter((s) => (s.points / s.nextRewardPoints) >= 0.8 && s.points < s.nextRewardPoints)
   const otherShops = shops.filter((s) => (s.points / s.nextRewardPoints) < 0.8)
 
   return (
     <ProtectedLayout>
-      <div className="page-enter px-4 pt-6 pb-4">
-        <h1 className="font-display font-bold text-2xl mb-2">Offerte & Premi</h1>
-        <p className="text-white/40 text-sm mb-6">I premi più vicini a te</p>
+      <div className="px-4 pt-8 pb-24">
+        <div style={{ animation: 'slideUp 0.4s cubic-bezier(0.16,1,0.3,1) both' }}>
+          <p className="text-xs font-medium mb-1" style={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.05em' }}>I tuoi progressi</p>
+          <h1 className="font-display font-bold text-2xl mb-6">Offerte & Premi</h1>
+        </div>
 
         {isLoading ? (
           <div className="flex flex-col gap-3">
-            {[1, 2, 3].map((i) => <div key={i} className="glass rounded-2xl h-32 animate-pulse" />)}
+            {[1,2,3].map((i) => <div key={i} className="rounded-2xl h-32 animate-pulse" style={{ background: 'rgba(255,255,255,0.03)' }} />)}
           </div>
         ) : shops.length === 0 ? (
-          <div className="glass rounded-2xl p-10 text-center">
-            <p className="text-5xl mb-3">🎯</p>
-            <p className="font-semibold mb-1">Nessuna offerta disponibile</p>
-            <p className="text-white/40 text-sm">Visita i negozi Fidelio per accumulare punti</p>
+          <div className="rounded-2xl p-10 text-center" style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)' }}>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3" style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)' }}>🎯</div>
+            <p className="font-semibold text-sm mb-1">Nessuna offerta disponibile</p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>Visita i negozi Fidelio per accumulare punti</p>
           </div>
         ) : (
-          <>
-            {closeShops.length > 0 && (
-              <>
+          <div className="flex flex-col gap-6">
+            {readyShops.length > 0 && (
+              <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-gold">🔥</span>
-                  <h2 className="font-semibold text-sm text-gold">Quasi pronti</h2>
+                  <span>🎉</span>
+                  <h2 className="text-xs font-semibold" style={{ color: '#34D399', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Pronti da riscattare</h2>
                 </div>
-                <div className="flex flex-col gap-3 mb-6">
-                  {closeShops.map((shop) => <OfferCard key={shop.shopId} shop={shop} />)}
-                </div>
-              </>
-            )}
-
-            {otherShops.length > 0 && (
-              <>
-                <h2 className="font-semibold text-sm text-white/50 mb-3">In corso</h2>
                 <div className="flex flex-col gap-3">
-                  {otherShops.map((shop) => <OfferCard key={shop.shopId} shop={shop} />)}
+                  {readyShops.map((s, i) => <OfferCard key={s.shopId} shop={s} index={i} />)}
                 </div>
-              </>
+              </div>
             )}
-          </>
+            {closeShops.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <span>🔥</span>
+                  <h2 className="text-xs font-semibold" style={{ color: '#F59E0B', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Quasi pronti</h2>
+                </div>
+                <div className="flex flex-col gap-3">
+                  {closeShops.map((s, i) => <OfferCard key={s.shopId} shop={s} index={i} />)}
+                </div>
+              </div>
+            )}
+            {otherShops.length > 0 && (
+              <div>
+                <h2 className="text-xs font-semibold mb-3" style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>In corso</h2>
+                <div className="flex flex-col gap-3">
+                  {otherShops.map((s, i) => <OfferCard key={s.shopId} shop={s} index={i} />)}
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </ProtectedLayout>
