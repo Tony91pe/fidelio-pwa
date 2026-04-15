@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getAllShops } from '@/lib/api'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
 import { getCategoryConfig } from '@/lib/categories'
-import { getCityCoordinates } from '@/lib/cities'
+import { getCityCoordinates, geocodeCity } from '@/lib/cities'
 import { Shop } from '@/types'
 import dynamic from 'next/dynamic'
 
@@ -110,15 +110,18 @@ export default function ScopriPage() {
     } else if (search.length === 0) {
       setSelectedShop(null)
       setCenterCity(null)
-    } else if (filtered.length === 0 && search.length > 1) {
-      // Provare a cercare una città conosciuta
-      const cityCoords = getCityCoordinates(search)
-      if (cityCoords) {
-        setCenterCity(cityCoords)
-        setView('map')
-      } else {
-        setCenterCity(null)
-      }
+    } else if (filtered.length === 0 && search.length > 2) {
+      // Geocoding con Nominatim per qualsiasi città italiana
+      const timer = setTimeout(async () => {
+        const cityCoords = await geocodeCity(search)
+        if (cityCoords) {
+          setCenterCity(cityCoords)
+          setView('map')
+        } else {
+          setCenterCity(null)
+        }
+      }, 600) // debounce 600ms
+      return () => clearTimeout(timer)
     } else {
       setCenterCity(null)
     }
