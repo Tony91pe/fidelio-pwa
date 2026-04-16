@@ -153,8 +153,8 @@ export const createShopGiftCard = (data: { value: number; description?: string; 
 export const scanShopGiftCard = (code: string) =>
   shopApi.get(`/api/shop/gift-cards/scan/${code}`)
 
-export const useShopGiftCard = (id: string) =>
-  shopApi.post(`/api/shop/gift-cards/${id}/use`)
+export const useShopGiftCard = (id: string, amount?: number) =>
+  shopApi.post(`/api/shop/gift-cards/${id}/use`, amount ? { amount } : {})
 
 export const deleteShopGiftCard = (id: string) =>
   shopApi.delete(`/api/shop/gift-cards/${id}`)

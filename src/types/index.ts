@@ -121,6 +121,7 @@ export interface ShopGiftCard {
   id: string
   code: string
   value: number
+  remainingValue: number
   description: string | null
   customerName: string | null
   customerEmail: string | null

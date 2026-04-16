@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(///wsl.localhost/Ubuntu/home/repair/**)",
+      "Read(///wsl.localhost/Ubuntu/home/**)",
+      "Bash(tree -L 3 //wsl.localhost/Ubuntu/home/repair/progetti/fidelio-pwa/src)",
+      "Read(///wsl.localhost/Ubuntu/home/repair/progetti/fidelio-pwa/**)",
+      "Read(//home/repair/progetti/fidelio-pwa/src/store/**)",
+      "Read(///wsl.localhost/Ubuntu/home/repair/progetti/fidelio-pwa/src/store/**)",
+      "Read(//home/repair/progetti/fidelio-pwa/src/lib/**)",
+      "Read(///wsl.localhost/Ubuntu/home/repair/progetti/fidelio-pwa/src/lib/**)",
+      "Read(//home/repair/progetti/fidelio-pwa/src/components/**)",
+      "Read(///wsl.localhost/Ubuntu/home/repair/progetti/fidelio-pwa/src/components/**)",
+      "Bash(npx tsc *)",
+      "Read(//mnt/c/Users/**)",
+      "Read(///wsl.localhost/Ubuntu/home/repair/progetti/**)",
+      "Read(///wsl.localhost/Ubuntu/home/repair/progetti/fidelio-web/**)",
+      "Read(///wsl.localhost/Ubuntu/home/repair/progetti/fidelio-web/prisma/**)",
+      "Read(///wsl.localhost/Ubuntu/home/repair/progetti/fidelio-web/src/**)"
+    ],
+    "additionalDirectories": [
+      "\\home\\repair\\progetti\\fidelio-pwa\\src\\store",
+      "\\\\wsl.localhost\\Ubuntu\\home\\repair\\progetti\\fidelio-pwa\\src\\store",
+      "\\home\\repair\\progetti\\fidelio-pwa\\src\\lib",
+      "\\\\wsl.localhost\\Ubuntu\\home\\repair\\progetti\\fidelio-pwa\\src\\lib",
+      "\\home\\repair\\progetti\\fidelio-pwa\\src\\components",
+      "\\\\wsl.localhost\\Ubuntu\\home\\repair\\progetti\\fidelio-pwa\\src\\components",
+      "\\home\\repair\\progetti\\fidelio-web\\prisma",
+      "\\\\wsl.localhost\\Ubuntu\\home\\repair\\progetti\\fidelio-web\\prisma",
+      "\\home\\repair\\progetti\\fidelio-web\\src\\app\\api\\customer\\auth\\send-otp",
+      "\\\\wsl.localhost\\Ubuntu\\home\\repair\\progetti\\fidelio-web\\src\\app\\api\\customer\\auth\\send-otp",
+      "\\home\\repair\\progetti\\fidelio-web\\src\\app\\api\\customer\\auth\\verify-otp",
+      "\\\\wsl.localhost\\Ubuntu\\home\\repair\\progetti\\fidelio-web\\src\\app\\api\\customer\\auth\\verify-otp"
+    ]
+  }
+}
