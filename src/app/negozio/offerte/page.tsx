@@ -257,13 +257,13 @@ export default function ShopOffertePage() {
       {/* Form Modal */}
       {showForm && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center p-4"
-          style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)' }}
           onClick={closeForm}
         >
           <div
-            className="w-full max-w-sm rounded-3xl p-6"
-            style={{ background: '#0D1F17', border: '1px solid rgba(245,158,11,0.2)', animation: 'slideUp 0.3s cubic-bezier(0.16,1,0.3,1) both' }}
+            className="w-full max-w-sm rounded-3xl p-6 overflow-y-auto"
+            style={{ background: '#0D1F17', border: '1px solid rgba(245,158,11,0.2)', maxHeight: '90vh', animation: 'slideUp 0.3s cubic-bezier(0.16,1,0.3,1) both' }}
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="font-display font-bold text-lg mb-4">

@@ -26,6 +26,7 @@ function CustomerCard({ customer, onClick }: { customer: ShopCustomer; onClick: 
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm truncate">{customer.name}</p>
         <p className="text-xs mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>{customer.email}</p>
+        <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.25)' }}>Ultima visita: {lastVisit}</p>
       </div>
       <div className="text-right flex-shrink-0">
         <p className="font-bold text-base" style={{ color: '#10B981' }}>{customer.points}</p>
@@ -43,13 +44,13 @@ function CustomerDetailModal({ customerId, onClose }: { customerId: string; onCl
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)' }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-3xl overflow-hidden"
-        style={{ background: '#0D1F17', border: '1px solid rgba(16,185,129,0.2)', animation: 'slideUp 0.3s cubic-bezier(0.16,1,0.3,1) both' }}
+        className="w-full max-w-sm rounded-3xl overflow-y-auto"
+        style={{ background: '#0D1F17', border: '1px solid rgba(16,185,129,0.2)', maxHeight: '90vh', animation: 'slideUp 0.3s cubic-bezier(0.16,1,0.3,1) both' }}
         onClick={(e) => e.stopPropagation()}
       >
         {isLoading ? (
