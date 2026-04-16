@@ -75,10 +75,13 @@ export default function ShopDashboard() {
           </div>
           <Link href="/negozio/profilo">
             <div
-              className="w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-sm"
+              className="w-10 h-10 rounded-2xl overflow-hidden flex items-center justify-center font-bold text-sm flex-shrink-0"
               style={{ background: 'linear-gradient(135deg, #10B981, #0EA5E9)', boxShadow: '0 4px 12px rgba(16,185,129,0.4)' }}
             >
-              {shopUser?.name?.[0]?.toUpperCase() || '🏪'}
+              {shop?.logo
+                ? <img src={shop.logo} alt={shop.name} className="w-full h-full object-cover" />
+                : shopUser?.name?.[0]?.toUpperCase() || '🏪'
+              }
             </div>
           </Link>
         </div>

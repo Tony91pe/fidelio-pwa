@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useMutation } from '@tanstack/react-query'
 import { ShopProtectedLayout } from '@/components/ShopProtectedLayout'
 import { useShopAuthStore } from '@/store/shopAuthStore'
-import { updateShopProfile } from '@/lib/api'
+import { updateShopProfile, uploadShopLogo } from '@/lib/api'
 import { getCategoryConfig } from '@/lib/categories'
 import { CategoryKey } from '@/types'
 import axios from 'axios'
@@ -39,6 +39,23 @@ export default function ShopProfiloPage() {
   })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [logoPreview, setLogoPreview] = useState<string | null>(null)
+  const [logoUploading, setLogoUploading] = useState(false)
+
+  async function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLogoPreview(URL.createObjectURL(file))
+    setLogoUploading(true)
+    try {
+      const res = await uploadShopLogo(file)
+      updateShop({ ...shop!, logo: res.data.logo })
+    } catch {
+      setError('Errore nel caricamento del logo')
+    } finally {
+      setLogoUploading(false)
+    }
+  }
 
   const updateMutation = useMutation({
     mutationFn: () => updateShopProfile({
@@ -112,16 +129,30 @@ export default function ShopProfiloPage() {
         >
           <div className="absolute top-0 right-0 w-32 h-32 rounded-full pointer-events-none" style={{ background: 'rgba(16,185,129,0.1)', filter: 'blur(30px)', transform: 'translate(30%,-30%)' }} />
           <div className="flex items-center gap-4">
-            <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-              style={{ background: cfg.color + '22', border: `1px solid ${cfg.color}44` }}
-            >
-              {cfg.emoji}
-            </div>
+            {/* Logo con upload */}
+            <label className="relative cursor-pointer flex-shrink-0 group">
+              <div className="w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center text-2xl"
+                style={{ background: cfg.color + '22', border: `1px solid ${cfg.color}44` }}>
+                {logoPreview || shop?.logo
+                  ? <img src={logoPreview || shop?.logo!} alt="logo" className="w-full h-full object-cover" />
+                  : cfg.emoji
+                }
+              </div>
+              {/* overlay modifica */}
+              <div className="absolute inset-0 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity"
+                style={{ background: 'rgba(0,0,0,0.55)' }}>
+                {logoUploading
+                  ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                }
+              </div>
+              <input type="file" accept="image/*" className="hidden" onChange={handleLogoChange} />
+            </label>
             <div>
               <p className="font-display font-bold text-lg">{shop?.name}</p>
               <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{cfg.label} · {shop?.city}</p>
               <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>{shopUser?.email}</p>
+              <p className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>Tocca il logo per cambiarlo</p>
             </div>
           </div>
         </div>

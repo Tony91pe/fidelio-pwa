@@ -160,6 +160,14 @@ export const deleteShopGiftCard = (id: string) =>
   shopApi.delete(`/api/shop/gift-cards/${id}`)
 
 // ─── Shop Profile ────────────────────────────────────────────────────────────
+export const uploadShopLogo = (file: File) => {
+  const formData = new FormData()
+  formData.append('logo', file)
+  return shopApi.post('/api/shop/logo', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+}
+
 export const updateShopProfile = (data: {
   name?: string
   address?: string

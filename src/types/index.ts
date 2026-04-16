@@ -16,6 +16,7 @@ export interface Shop {
   address: string
   city: string
   phone: string | null
+  logo?: string | null
   lat?: number
   lng?: number
   rewardThreshold: number
