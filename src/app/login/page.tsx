@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuthStore } from '@/store/authStore'
 import { sendOTP, verifyOTP } from '@/lib/api'
 import axios from 'axios'
@@ -200,6 +201,12 @@ export default function LoginPage() {
             </form>
           )}
         </div>
+      </div>
+
+      <div className="pb-10 text-center">
+        <Link href="/negozio/login" className="text-white/30 text-xs hover:text-white/50 transition-colors">
+          Sei un negozio? Accedi al portale →
+        </Link>
       </div>
     </div>
   )

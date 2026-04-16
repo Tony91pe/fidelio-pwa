@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useShopAuthStore } from '@/store/shopAuthStore'
 import { shopSendOTP, shopVerifyOTP } from '@/lib/api'
 import axios from 'axios'
@@ -214,6 +215,12 @@ export default function ShopLoginPage() {
             </form>
           )}
         </div>
+      </div>
+
+      <div className="pb-10 text-center">
+        <Link href="/login" className="text-xs transition-colors" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          ← Torna al login clienti
+        </Link>
       </div>
     </div>
   )
