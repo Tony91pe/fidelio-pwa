@@ -24,6 +24,7 @@ export default function MapComponent({ shops, selectedShop, onSelectShop, userLo
     initializedRef.current = true
     const initMap = async () => {
       const L = await import('leaflet')
+      // @ts-ignore
       await import('leaflet/dist/leaflet.css')
       if (!containerRef.current) return
       const map = L.map(containerRef.current, { center: [42.3498, 13.3995], zoom: 10, zoomControl: false })

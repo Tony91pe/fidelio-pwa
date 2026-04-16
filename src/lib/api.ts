@@ -168,6 +168,7 @@ export const updateShopProfile = (data: {
   category?: string
   rewardThreshold?: number
   rewardDescription?: string
+  pointsSystem?: string
   pointsPerVisit?: number
   pointsPerEuro?: number
   welcomePoints?: number

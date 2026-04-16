@@ -32,7 +32,7 @@ export default function ShopProfiloPage() {
     category: shop?.category || 'other',
     rewardThreshold: String(shop?.rewardThreshold || 100),
     rewardDescription: shop?.rewardDescription || '',
-    pointsSystem: shop?.pointsSystem || 'per_visit',
+    pointsSystem: (shop?.pointsSystem || 'per_visit') as 'per_visit' | 'per_euro' | 'combined',
     pointsPerVisit: String(shop?.pointsPerVisit || 1),
     pointsPerEuro: String(shop?.pointsPerEuro || 1),
     welcomePoints: String(shop?.welcomePoints || 0),
@@ -194,7 +194,7 @@ export default function ShopProfiloPage() {
                 <button
                   key={ps.value}
                   type="button"
-                  onClick={() => setFormData((p) => ({ ...p, pointsSystem: ps.value }))}
+                  onClick={() => setFormData((p) => ({ ...p, pointsSystem: ps.value as 'per_visit' | 'per_euro' | 'combined' }))}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-left"
                   style={{
                     background: formData.pointsSystem === ps.value ? 'rgba(16,185,129,0.12)' : 'rgba(255,255,255,0.04)',
