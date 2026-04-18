@@ -16,7 +16,8 @@
       "Read(///wsl.localhost/Ubuntu/home/repair/progetti/**)",
       "Read(///wsl.localhost/Ubuntu/home/repair/progetti/fidelio-web/**)",
       "Read(///wsl.localhost/Ubuntu/home/repair/progetti/fidelio-web/prisma/**)",
-      "Read(///wsl.localhost/Ubuntu/home/repair/progetti/fidelio-web/src/**)"
+      "Read(///wsl.localhost/Ubuntu/home/repair/progetti/fidelio-web/src/**)",
+      "Bash(powershell.exe -NoProfile -Command \"Set-Location C:\\\\; wsl -d Ubuntu -- bash -c 'ls /home/repair/progetti/fidelio-web/src/app/api/'\")"
     ],
     "additionalDirectories": [
       "\\home\\repair\\progetti\\fidelio-pwa\\src\\store",

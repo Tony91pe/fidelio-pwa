@@ -130,7 +130,7 @@ export default function ShopProfiloPage() {
           <div className="absolute top-0 right-0 w-32 h-32 rounded-full pointer-events-none" style={{ background: 'rgba(16,185,129,0.1)', filter: 'blur(30px)', transform: 'translate(30%,-30%)' }} />
           <div className="flex items-center gap-4">
             {/* Logo con upload */}
-            <label className="relative cursor-pointer flex-shrink-0 group">
+            <label className="relative cursor-pointer flex-shrink-0">
               <div className="w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center text-2xl"
                 style={{ background: cfg.color + '22', border: `1px solid ${cfg.color}44` }}>
                 {logoPreview || shop?.logo
@@ -138,12 +138,14 @@ export default function ShopProfiloPage() {
                   : cfg.emoji
                 }
               </div>
-              {/* overlay modifica */}
-              <div className="absolute inset-0 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity"
-                style={{ background: 'rgba(0,0,0,0.55)' }}>
+              {/* Badge fotocamera sempre visibile */}
+              <div
+                className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-xl flex items-center justify-center"
+                style={{ background: logoUploading ? 'rgba(16,185,129,0.8)' : '#10B981', boxShadow: '0 2px 8px rgba(16,185,129,0.5)', border: '2px solid rgba(0,0,0,0.3)' }}
+              >
                 {logoUploading
-                  ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  ? <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
                 }
               </div>
               <input type="file" accept="image/*" className="hidden" onChange={handleLogoChange} />
@@ -152,7 +154,7 @@ export default function ShopProfiloPage() {
               <p className="font-display font-bold text-lg">{shop?.name}</p>
               <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>{cfg.label} · {shop?.city}</p>
               <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>{shopUser?.email}</p>
-              <p className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.25)' }}>Tocca il logo per cambiarlo</p>
+              <p className="text-[10px] mt-1" style={{ color: 'rgba(16,185,129,0.6)' }}>Tocca il logo per cambiarlo</p>
             </div>
           </div>
         </div>
@@ -304,6 +306,40 @@ export default function ShopProfiloPage() {
                 <p className="text-sm font-medium text-right max-w-[55%]">{value}</p>
               </div>
             ))}
+
+            {/* Piano attuale */}
+            {(() => {
+              const planColor = shop?.plan === 'PRO' ? '#F97316' : shop?.plan === 'GROWTH' ? '#7C3AED' : '#6B7280'
+              return (
+                <Link href="/negozio/upgrade">
+                  <div
+                    className="flex items-center justify-between px-4 py-4 rounded-2xl"
+                    style={{ background: planColor + '12', border: `1px solid ${planColor}33` }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">⚡</span>
+                      <div>
+                        <p className="text-sm font-semibold">Piano attuale</p>
+                        <p className="text-xs font-bold mt-0.5" style={{ color: planColor }}>
+                          {shop?.plan ?? 'STARTER'}
+                          {shop?.plan === 'STARTER' && <span className="font-normal text-xs ml-1" style={{ color: 'rgba(255,255,255,0.4)' }}>· Aggiorna per sbloccare più funzionalità</span>}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {shop?.plan !== 'PRO' && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: planColor + '20', color: planColor }}>
+                          Upgrade
+                        </span>
+                      )}
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                      </svg>
+                    </div>
+                  </div>
+                </Link>
+              )
+            })()}
 
             {/* Navigation links */}
             <div className="flex flex-col gap-2 mt-2">

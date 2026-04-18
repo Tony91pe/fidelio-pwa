@@ -27,7 +27,7 @@ function ShopDetail({ shop, onClose }: { shop: Shop; onClose: () => void }) {
   }, [shop.id])
   const s = detail ?? shop
 return (
-    <div className="absolute bottom-4 left-4 right-4 animate-slide-up" style={{ background: 'rgba(22,22,42,0.97)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '16px', backdropFilter: 'blur(20px)', maxHeight: '60vh', overflowY: 'auto' }}>
+    <div className="absolute bottom-4 left-4 right-4 animate-slide-up" style={{ background: 'rgba(22,22,42,0.97)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '16px', backdropFilter: 'blur(20px)', maxHeight: '60vh', overflowY: 'auto', zIndex: 1000 }}>
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0">
           {s.logo

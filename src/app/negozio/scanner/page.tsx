@@ -14,6 +14,7 @@ interface CheckinResult {
   customerCode: string
   pointsAdded: number
   totalPoints: number
+  isFirstVisit: boolean
 }
 
 interface GiftCardResult {
@@ -401,8 +402,15 @@ export default function ShopScannerPage() {
 
                 {checkinResult ? (
                   <>
-                    <h3 className="font-display font-bold text-xl mb-1">Punti assegnati!</h3>
+                    <h3 className="font-display font-bold text-xl mb-1">
+                      {checkinResult.isFirstVisit ? '🎉 Nuovo cliente!' : 'Punti assegnati!'}
+                    </h3>
                     <p className="text-sm mb-3" style={{ color: 'rgba(255,255,255,0.5)' }}>{checkinResult.customerName}</p>
+                    {checkinResult.isFirstVisit && (
+                      <p className="text-xs mb-3 px-3 py-2 rounded-xl" style={{ background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.2)', color: '#A78BFA' }}>
+                        Prima visita — punti di benvenuto assegnati
+                      </p>
+                    )}
                     <div
                       className="rounded-xl p-3 mb-4"
                       style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)' }}

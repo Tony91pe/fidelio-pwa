@@ -89,6 +89,9 @@ export const getGiftCards = (email: string) =>
 export const getShopById = (id: string) =>
   api.get(`/api/app/shops/${id}`)
 
+export const checkinShop = (name: string, email: string, shopId: string) =>
+  api.post('/api/checkin', { name, email, shopId })
+
 export const updateCustomer = (data: { name?: string; birthday?: string }, token: string) =>
   api.post('/api/app/customer/update', data, { headers: { Authorization: `Bearer ${token}` } })
 

@@ -22,10 +22,11 @@ export function usePushNotifications() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      setPermission(Notification.permission)
-      setSubscribed(Notification.permission === 'granted')
-    }
+    if (typeof window === 'undefined' || !('Notification' in window) || !('serviceWorker' in navigator)) return
+    setPermission(Notification.permission)
+    navigator.serviceWorker.ready.then(reg => {
+      reg.pushManager.getSubscription().then(sub => setSubscribed(!!sub))
+    }).catch(() => {})
   }, [])
 
   async function subscribe() {

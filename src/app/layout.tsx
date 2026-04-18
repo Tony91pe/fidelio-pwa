@@ -20,6 +20,10 @@ export const metadata: Metadata = {
   title: 'Fidelio — La tua carta fedeltà digitale',
   description: 'Accumula punti nei tuoi negozi preferiti e vinci premi esclusivi',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',

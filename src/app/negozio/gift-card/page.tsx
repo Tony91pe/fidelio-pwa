@@ -6,6 +6,7 @@ import { ShopProtectedLayout } from '@/components/ShopProtectedLayout'
 import { useShopAuthStore } from '@/store/shopAuthStore'
 import { getShopGiftCards, createShopGiftCard, useShopGiftCard, deleteShopGiftCard } from '@/lib/api'
 import { ShopGiftCard } from '@/types'
+import { PlanGate } from '@/components/PlanGate'
 import axios from 'axios'
 
 function GiftCardVisual({ card, onUse, onDelete, onShare }: {
@@ -118,6 +119,7 @@ function GiftCardVisual({ card, onUse, onDelete, onShare }: {
 export default function ShopGiftCardPage() {
   const queryClient = useQueryClient()
   const { shop } = useShopAuthStore()
+
   const [showForm, setShowForm] = useState(false)
   const [filter, setFilter] = useState<'all' | 'active' | 'used'>('active')
   const [formData, setFormData] = useState({ value: '', description: '', customerEmail: '' })
@@ -199,6 +201,19 @@ export default function ShopGiftCardPage() {
     } else {
       navigator.clipboard.writeText(text).then(() => alert('Testo copiato negli appunti!')).catch(() => {})
     }
+  }
+
+  if (shop && shop.plan === 'STARTER') {
+    return (
+      <ShopProtectedLayout>
+        <PlanGate
+          currentPlan={shop.plan}
+          requiredPlan="GROWTH"
+          feature="Gift Card"
+          description="Crea e gestisci carte regalo per i tuoi clienti. Disponibile dal piano Growth."
+        />
+      </ShopProtectedLayout>
+    )
   }
 
   const filteredCards = cards?.filter((c) => {

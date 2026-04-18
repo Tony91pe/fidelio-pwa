@@ -67,7 +67,7 @@ export function BottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bottom-nav" style={{ background: 'rgba(15,15,26,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bottom-nav" style={{ background: 'rgba(12,10,26,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(124,58,237,0.15)' }}>
       <div className="flex items-center justify-around px-2 pt-2 pb-1">
         {tabs.map((tab) => {
           const active = pathname === tab.href

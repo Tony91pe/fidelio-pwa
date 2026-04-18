@@ -19,6 +19,7 @@ export interface Shop {
   logo?: string | null
   lat?: number
   lng?: number
+  plan?: string
   rewardThreshold: number
   rewardDescription: string
   pointsSystem: 'per_visit' | 'per_euro' | 'combined'

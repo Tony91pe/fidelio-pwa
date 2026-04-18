@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ShopProtectedLayout } from '@/components/ShopProtectedLayout'
+import { useShopAuthStore } from '@/store/shopAuthStore'
 import { getShopRewards, createShopReward, updateShopReward, deleteShopReward } from '@/lib/api'
 import { ShopReward } from '@/types'
 import axios from 'axios'
@@ -64,6 +65,7 @@ function RewardCard({ reward, onToggle, onDelete }: {
 
 export default function ShopPremiPage() {
   const queryClient = useQueryClient()
+  const { shop } = useShopAuthStore()
   const [showForm, setShowForm] = useState(false)
   const [description, setDescription] = useState('')
   const [points, setPoints] = useState('')
@@ -109,11 +111,15 @@ export default function ShopPremiPage() {
     createMutation.mutate()
   }
 
+  const isStarter = shop?.plan === 'STARTER'
+  const rewardsCount = rewards?.length ?? 0
+  const starterLimitReached = isStarter && rewardsCount >= 3
+
   return (
     <ShopProtectedLayout>
       <div className="px-4 pt-8 pb-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6" style={{ animation: 'slideUp 0.4s cubic-bezier(0.16,1,0.3,1) both' }}>
+        <div className="flex items-center justify-between mb-4" style={{ animation: 'slideUp 0.4s cubic-bezier(0.16,1,0.3,1) both' }}>
           <div>
             <h1 className="font-display font-bold text-2xl mb-1">Premi</h1>
             <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
@@ -121,13 +127,48 @@ export default function ShopPremiPage() {
             </p>
           </div>
           <button
-            onClick={() => setShowForm(true)}
+            onClick={() => !starterLimitReached && setShowForm(true)}
+            disabled={starterLimitReached}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all active:scale-95"
-            style={{ background: 'linear-gradient(135deg, #10B981, #0EA5E9)', boxShadow: '0 4px 12px rgba(16,185,129,0.4)' }}
+            style={{
+              background: starterLimitReached ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #10B981, #0EA5E9)',
+              boxShadow: starterLimitReached ? 'none' : '0 4px 12px rgba(16,185,129,0.4)',
+              color: starterLimitReached ? 'rgba(255,255,255,0.3)' : 'white',
+              cursor: starterLimitReached ? 'not-allowed' : 'pointer',
+            }}
           >
             <span>+</span> Nuovo
           </button>
         </div>
+
+        {/* STARTER limit banner */}
+        {isStarter && (
+          <div
+            className="rounded-xl px-4 py-3 mb-5 flex items-center justify-between"
+            style={{
+              background: starterLimitReached ? 'rgba(239,68,68,0.07)' : 'rgba(124,58,237,0.07)',
+              border: `1px solid ${starterLimitReached ? 'rgba(239,68,68,0.2)' : 'rgba(124,58,237,0.2)'}`,
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <span>{starterLimitReached ? '🔒' : '📊'}</span>
+              <p className="text-xs" style={{ color: starterLimitReached ? '#F87171' : 'rgba(255,255,255,0.5)' }}>
+                {starterLimitReached
+                  ? 'Limite piano Starter raggiunto'
+                  : `Piano Starter: ${rewardsCount}/3 premi`}
+              </p>
+            </div>
+            <a
+              href="https://fidelio-web.vercel.app/dashboard/upgrade"
+              target="_blank"
+              rel="noreferrer"
+              className="text-[11px] font-bold px-2.5 py-1 rounded-lg"
+              style={{ background: 'rgba(124,58,237,0.15)', color: '#A78BFA', border: '1px solid rgba(124,58,237,0.25)', textDecoration: 'none' }}
+            >
+              Upgrade →
+            </a>
+          </div>
+        )}
 
         {/* Rewards list */}
         {isLoading ? (
@@ -146,13 +187,15 @@ export default function ShopPremiPage() {
             <p className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>
               Crea premi per incentivare i tuoi clienti
             </p>
-            <button
-              onClick={() => setShowForm(true)}
-              className="px-6 py-2.5 rounded-xl font-semibold text-sm"
-              style={{ background: 'linear-gradient(135deg, #10B981, #0EA5E9)' }}
-            >
-              Crea primo premio
-            </button>
+            {!starterLimitReached && (
+              <button
+                onClick={() => setShowForm(true)}
+                className="px-6 py-2.5 rounded-xl font-semibold text-sm"
+                style={{ background: 'linear-gradient(135deg, #10B981, #0EA5E9)' }}
+              >
+                Crea primo premio
+              </button>
+            )}
           </div>
         ) : (
           <div className="flex flex-col gap-3" style={{ animation: 'slideUp 0.4s cubic-bezier(0.16,1,0.3,1) 0.05s both' }}>

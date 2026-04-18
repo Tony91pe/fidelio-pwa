@@ -27,7 +27,7 @@ export default function MapComponent({ shops, selectedShop, onSelectShop, userLo
       // @ts-ignore
       await import('leaflet/dist/leaflet.css')
       if (!containerRef.current) return
-      const map = L.map(containerRef.current, { center: [42.3498, 13.3995], zoom: 10, zoomControl: false })
+      const map = L.map(containerRef.current, { center: [42.3498, 13.3995], zoom: 10, zoomControl: false, tap: false } as any)
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(map)
       L.control.zoom({ position: 'bottomright' }).addTo(map)
       mapRef.current = { map, L }
@@ -57,7 +57,7 @@ export default function MapComponent({ shops, selectedShop, onSelectShop, userLo
         })
         const marker = L.marker([shop.lat!, shop.lng!], { icon, zIndexOffset: isSelected ? 2000 : 1000 })
           .addTo(map)
-          .on('click', () => { onSelectShop(shop) })
+          .on('click', (e: any) => { L.DomEvent.stopPropagation(e); onSelectShop(shop) })
         markersRef.current.push(marker)
       })
       if (shopsWithCoords.length > 0 && !selectedShop) {

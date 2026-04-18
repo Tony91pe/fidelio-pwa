@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ShopProtectedLayout } from '@/components/ShopProtectedLayout'
+import { useShopAuthStore } from '@/store/shopAuthStore'
 import { getShopOffers, createShopOffer, updateShopOffer, deleteShopOffer } from '@/lib/api'
 import { ShopOffer } from '@/types'
+import { PlanGate } from '@/components/PlanGate'
 import axios from 'axios'
 
 function OfferCard({ offer, onToggle, onDelete, onEdit }: {
@@ -105,6 +107,7 @@ interface OfferFormData {
 
 export default function ShopOffertePage() {
   const queryClient = useQueryClient()
+  const { shop } = useShopAuthStore()
   const [showForm, setShowForm] = useState(false)
   const [editingOffer, setEditingOffer] = useState<ShopOffer | null>(null)
   const [formData, setFormData] = useState<OfferFormData>({ title: '', description: '', expiresAt: '' })
@@ -193,6 +196,19 @@ export default function ShopOffertePage() {
   }
 
   const isMutating = createMutation.isPending || updateMutation.isPending
+
+  if (shop && shop.plan === 'STARTER') {
+    return (
+      <ShopProtectedLayout>
+        <PlanGate
+          currentPlan={shop.plan}
+          requiredPlan="GROWTH"
+          feature="Offerte"
+          description="Crea offerte speciali per i tuoi clienti. Disponibile dal piano Growth."
+        />
+      </ShopProtectedLayout>
+    )
+  }
 
   return (
     <ShopProtectedLayout>
