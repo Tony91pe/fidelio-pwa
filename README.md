@@ -54,9 +54,9 @@ The platform includes:
 
 ---
 
-## 🌐 Live App
+## 🌐 Live Website
 
-👉 **https://app.fidelio.app**
+👉 **https://getfidelio.com**
 
 ---
 
@@ -72,27 +72,15 @@ npm run dev
 ## 🗂 Project Structure
 
 ```
-src/
-  app/
-    page.tsx              # Home — points & loyalty cards
-    login/                # Email OTP login
-    scan/                 # QR scanner + personal QR
-    premi/                # Rewards & gift cards
-    offerte/              # Active offers
-    scopri/               # Map — nearby shops
-    profilo/              # User profile
-    storico/              # History
-    onboarding/           # First-time setup
-    negozio/              # Shop portal (scanner, offers, rewards, upgrade)
-  components/
-  hooks/
-  lib/
-  store/
-  types/
-public/
-  icons/
-  manifest.json
-worker/
+/app
+  /auth
+  /wallet
+  /rewards
+  /map
+/components
+/hooks
+/lib
+/public
 ```
 
 ---
