@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useAuthStore } from '@/store/authStore'
 import { sendOTP, verifyOTP } from '@/lib/api'
 import axios from 'axios'
+import { FidelioLogo } from '@/components/FidelioLogo/FidelioLogo'
 
 export default function LoginPage() {
   const [step, setStep] = useState<'email' | 'otp'>('email')
@@ -115,15 +116,8 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-16">
 
         {/* Logo */}
-        <div className="mb-10 text-center" style={{ animation: 'slideUp 0.5s cubic-bezier(0.16,1,0.3,1) both' }}>
-          <div
-            className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-4"
-            style={{ background: 'linear-gradient(135deg, #7C3AED, #3B82F6)', boxShadow: '0 12px 40px rgba(124,58,237,0.5)' }}
-          >
-            <span className="font-display font-black text-3xl">F</span>
-          </div>
-          <h1 className="font-display font-black text-3xl">Fidelio</h1>
-          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.35)' }}>La tua carta fedeltà digitale</p>
+        <div className="mb-10 flex justify-center" style={{ animation: 'slideUp 0.5s cubic-bezier(0.16,1,0.3,1) both' }}>
+          <FidelioLogo size="md" tagline={true} animate={true} />
         </div>
 
         <div className="w-full max-w-sm" style={{ animation: 'slideUp 0.5s cubic-bezier(0.16,1,0.3,1) 0.08s both' }}>

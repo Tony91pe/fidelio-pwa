@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useShopAuthStore } from '@/store/shopAuthStore'
 import { shopSendOTP, shopVerifyOTP } from '@/lib/api'
 import axios from 'axios'
+import { FidelioLogo } from '@/components/FidelioLogo/FidelioLogo'
 
 export default function ShopLoginPage() {
   const [step, setStep] = useState<'email' | 'otp'>('email')
@@ -107,15 +108,8 @@ export default function ShopLoginPage() {
 
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-16">
         {/* Logo */}
-        <div className="mb-10 text-center">
-          <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-            style={{ background: 'linear-gradient(135deg, #10B981, #0EA5E9)', boxShadow: '0 8px 32px rgba(16,185,129,0.4)' }}
-          >
-            <span className="text-3xl">🏪</span>
-          </div>
-          <h1 className="font-display font-black text-3xl">Fidelio</h1>
-          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>Portale Negozio</p>
+        <div className="mb-10 flex justify-center">
+          <FidelioLogo size="md" tagline={true} animate={true} />
         </div>
 
         <div className="w-full max-w-sm">

@@ -9,7 +9,7 @@ const withPWA = require('next-pwa')({
       urlPattern: /^https?.*/,
       handler: 'NetworkFirst',
       options: {
-        cacheName: 'fidelio-cache',
+        cacheName: 'fidelio-cache-v2',
         expiration: { maxEntries: 200, maxAgeSeconds: 86400 },
         networkTimeoutSeconds: 10,
       },

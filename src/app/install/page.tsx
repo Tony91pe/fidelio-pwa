@@ -67,13 +67,18 @@ export default function InstallPage() {
               Apri la fotocamera e inquadra il codice per installare l'app
             </p>
             <div className="flex justify-center">
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://getfidelio.app/install&bgcolor=ffffff&color=1a1a2e&margin=10`}
-                alt="QR install"
-                style={{ borderRadius: 16, width: 180, height: 180 }}
-              />
+              <div style={{ position: 'relative', width: 180, height: 180 }}>
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://app.getfidelio.app/install&bgcolor=ffffff&color=1a1a2e&margin=10&ecc=H`}
+                  alt="QR install"
+                  style={{ borderRadius: 16, width: 180, height: 180 }}
+                />
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 38, height: 38, background: 'white', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 4 }}>
+                  <img src="/icons/icon-96x96.svg" alt="Fidelio" style={{ width: 30, height: 30 }} />
+                </div>
+              </div>
             </div>
-            <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12, marginTop: 12 }}>getfidelio.app/install</p>
+            <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12, marginTop: 12 }}>app.getfidelio.app/install</p>
           </div>
         ) : (
           <>
