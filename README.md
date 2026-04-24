@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/icons/icon-192x192.svg" width="120" alt="Fidelio Logo" />
+  <img src="public/logo.svg" width="120" alt="Fidelio Logo" />
 </p>
 
 <h1 align="center">Fidelio — Loyalty Platform for Local Shops (PWA)</h1>
