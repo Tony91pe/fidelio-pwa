@@ -10,12 +10,18 @@ import { usePushNotifications } from '@/hooks/usePushNotifications'
 import Link from 'next/link'
 
 function getTier(visits: number) {
-  if (visits >= 50) return { label: 'Platino', color: '#E2E8F0', emoji: '💎' }
-  if (visits >= 25) return { label: 'Oro', color: '#FBBF24', emoji: '🏆' }
-  if (visits >= 10) return { label: 'Argento', color: '#94A3B8', emoji: '⭐' }
-  if (visits >= 3)  return { label: 'Bronzo', color: '#CD7C2F', emoji: '🎖️' }
-  return { label: 'Nuovo', color: '#A78BFA', emoji: '✨' }
+  if (visits >= 50) return { label: 'Platino', color: '#E2E8F0', bg: 'rgba(226,232,240,0.1)', emoji: '💎' }
+  if (visits >= 25) return { label: 'Oro',     color: '#FBBF24', bg: 'rgba(251,191,36,0.1)',  emoji: '🏆' }
+  if (visits >= 10) return { label: 'Argento', color: '#94A3B8', bg: 'rgba(148,163,184,0.1)', emoji: '⭐' }
+  if (visits >= 3)  return { label: 'Bronzo',  color: '#CD7C2F', bg: 'rgba(205,124,47,0.1)',  emoji: '🎖️' }
+  return { label: 'Nuovo', color: '#A78BFA', bg: 'rgba(167,139,250,0.1)', emoji: '✨' }
 }
+
+const ChevronRight = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="9 18 15 12 9 6"/>
+  </svg>
+)
 
 export default function ProfiloPage() {
   const { customer, logout } = useAuthStore()
@@ -39,113 +45,135 @@ export default function ProfiloPage() {
     router.replace('/login')
   }
 
-  const menuItems = [
-    { label: 'I miei negozi', icon: '🏪', href: '/', color: '#A78BFA' },
-    { label: 'I miei premi', icon: '🏆', href: '/premi', color: '#FBBF24' },
-    { label: 'Storico visite', icon: '📋', href: '/storico', color: '#10B981' },
-    { label: 'Offerte & Premi', icon: '🔥', href: '/offerte', color: '#F59E0B' },
-    { label: 'Scopri negozi', icon: '🗺️', href: '/scopri', color: '#60A5FA' },
+  const menuSections = [
+    {
+      title: 'Attività',
+      items: [
+        { label: 'Le mie carte fedeltà', icon: '🃏', href: '/',         color: '#A78BFA' },
+        { label: 'I miei premi',         icon: '🏆', href: '/premi',    color: '#FBBF24' },
+        { label: 'Storico visite',       icon: '📋', href: '/storico',  color: '#10B981' },
+        { label: 'Offerte & Promo',      icon: '🔥', href: '/offerte',  color: '#F59E0B' },
+        { label: 'Scopri negozi',        icon: '🗺️', href: '/scopri',   color: '#60A5FA' },
+      ],
+    },
   ]
 
   return (
     <ProtectedLayout>
       <div className="pb-10">
 
-        {/* Hero profilo */}
+        {/* Hero */}
         <div
           className="relative overflow-hidden px-5 pt-14 pb-8"
           style={{ background: 'linear-gradient(180deg, rgba(109,40,217,0.2) 0%, transparent 100%)' }}
         >
-          <div className="absolute top-0 left-0 right-0 h-48 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124,58,237,0.18) 0%, transparent 100%)' }} />
+          <div className="absolute top-0 left-0 right-0 h-52 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124,58,237,0.2) 0%, transparent 100%)' }} />
 
-          {/* Avatar centrato */}
-          <div className="flex flex-col items-center text-center">
-            <div
-              className="relative w-24 h-24 rounded-3xl flex items-center justify-center font-display font-black text-4xl mb-4"
-              style={{
-                background: 'linear-gradient(135deg, #7C3AED, #3B82F6)',
-                boxShadow: '0 12px 40px rgba(124,58,237,0.5), 0 0 0 1px rgba(255,255,255,0.08)',
-              }}
-            >
-              {firstName[0]?.toUpperCase()}
-              {/* Badge tier */}
+          <div className="flex flex-col items-center text-center relative">
+            {/* Avatar */}
+            <div className="relative mb-4">
               <div
-                className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl flex items-center justify-center text-base"
-                style={{ background: '#0D0D1A', border: '2px solid rgba(255,255,255,0.08)' }}
+                className="w-24 h-24 rounded-3xl flex items-center justify-center font-display font-black text-4xl"
+                style={{
+                  background: 'linear-gradient(135deg, #7C3AED, #3B82F6)',
+                  boxShadow: '0 12px 40px rgba(124,58,237,0.5), 0 0 0 1px rgba(255,255,255,0.08)',
+                }}
+              >
+                {firstName[0]?.toUpperCase()}
+              </div>
+              {/* Tier badge */}
+              <div
+                className="absolute -bottom-2 -right-2 w-9 h-9 rounded-xl flex items-center justify-center text-lg"
+                style={{ background: '#0F0F1A', border: `2px solid ${tier.color}40`, boxShadow: `0 0 12px ${tier.color}30` }}
               >
                 {tier.emoji}
               </div>
             </div>
 
-            <h1 className="font-display font-bold text-2xl mb-1">{customer?.name}</h1>
-            <p className="text-sm mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>{customer?.email}</p>
-            <span className="text-xs font-bold px-3 py-1 rounded-full mb-5" style={{ background: 'rgba(167,139,250,0.1)', color: tier.color, border: `1px solid ${tier.color}30` }}>
+            {/* Name + email */}
+            <h1 className="font-display font-bold text-2xl leading-tight mb-0.5">{customer?.name}</h1>
+            <p className="text-sm mb-3" style={{ color: 'rgba(255,255,255,0.35)' }}>{customer?.email}</p>
+
+            {/* Tier badge */}
+            <span
+              className="text-xs font-bold px-4 py-1.5 rounded-full mb-6"
+              style={{ background: tier.bg, color: tier.color, border: `1px solid ${tier.color}30` }}
+            >
               {tier.emoji} {tier.label}
             </span>
 
-            {/* Stats */}
-            <div className="flex items-center gap-6">
+            {/* Stats row */}
+            <div
+              className="flex items-center gap-0 w-full rounded-2xl overflow-hidden"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+            >
               {[
-                { label: 'Punti', value: totalPoints, color: '#A78BFA' },
-                { label: 'Visite', value: totalVisits, color: '#60A5FA' },
-                { label: 'Negozi', value: shops.length, color: '#F0ABFC' },
+                { label: 'Punti',  value: totalPoints,   color: '#A78BFA' },
+                { label: 'Visite', value: totalVisits,   color: '#60A5FA' },
+                { label: 'Negozi', value: shops.length,  color: '#F0ABFC' },
               ].map((stat, i, arr) => (
-                <div key={stat.label} className="flex items-center gap-6">
-                  <div className="text-center">
-                    <p className="font-display font-black text-3xl leading-none" style={{ color: stat.color }}>{stat.value}</p>
-                    <p className="text-[10px] mt-1 font-medium tracking-wide uppercase" style={{ color: 'rgba(255,255,255,0.3)' }}>{stat.label}</p>
-                  </div>
-                  {i < arr.length - 1 && <div className="w-px h-8" style={{ background: 'rgba(255,255,255,0.08)' }} />}
+                <div
+                  key={stat.label}
+                  className="flex-1 py-4 text-center"
+                  style={{ borderRight: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}
+                >
+                  <p className="font-display font-black text-2xl leading-none" style={{ color: stat.color }}>{stat.value}</p>
+                  <p className="text-[10px] mt-1.5 font-semibold tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.28)' }}>{stat.label}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Codice */}
-        <div className="px-5 mb-6">
+        {/* Codice Fidelio */}
+        <div className="px-5 mb-5">
           <div
             className="rounded-2xl px-4 py-3.5 flex items-center justify-between"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+            style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)' }}
           >
             <div>
-              <p className="text-[10px] tracking-widest uppercase font-semibold mb-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>Il tuo codice Fidelio</p>
-              <p className="font-mono font-bold text-lg tracking-widest text-white">{customer?.code}</p>
+              <p className="text-[10px] tracking-widest uppercase font-semibold mb-0.5" style={{ color: 'rgba(167,139,250,0.6)' }}>Il tuo codice Fidelio</p>
+              <p className="font-mono font-bold text-xl tracking-[0.2em] text-white">{customer?.code}</p>
             </div>
-            <div className="text-2xl">🪪</div>
+            <div className="text-2xl opacity-70">🪪</div>
           </div>
         </div>
 
-        {/* Navigazione */}
-        <div className="px-5 mb-5">
-          <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: 'rgba(255,255,255,0.3)' }}>Navigazione</p>
-          <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
-            {menuItems.map((item, i) => (
-              <Link key={item.href} href={item.href}>
-                <div
-                  className="flex items-center gap-3.5 px-4 py-4 active:bg-white/5 transition-colors"
-                  style={{ borderBottom: i < menuItems.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none', background: 'rgba(255,255,255,0.025)' }}
-                >
+        {/* Menu sezioni */}
+        {menuSections.map(section => (
+          <div key={section.title} className="px-5 mb-5">
+            <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-3" style={{ color: 'rgba(255,255,255,0.25)' }}>{section.title}</p>
+            <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+              {section.items.map((item, i) => (
+                <Link key={item.href} href={item.href}>
                   <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0"
-                    style={{ background: item.color + '15', border: `1px solid ${item.color}20` }}
+                    className="flex items-center gap-3.5 px-4 py-3.5 active:bg-white/5 transition-colors"
+                    style={{
+                      background: 'rgba(255,255,255,0.025)',
+                      borderBottom: i < section.items.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                    }}
                   >
-                    {item.icon}
+                    <div
+                      className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0"
+                      style={{ background: item.color + '14', border: `1px solid ${item.color}22` }}
+                    >
+                      {item.icon}
+                    </div>
+                    <span className="font-semibold text-sm flex-1 text-white">{item.label}</span>
+                    <ChevronRight />
                   </div>
-                  <span className="font-semibold text-sm flex-1 text-white">{item.label}</span>
-                  <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 18, fontWeight: 300 }}>›</span>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        ))}
 
         {/* Impostazioni */}
         <div className="px-5 mb-6">
-          <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: 'rgba(255,255,255,0.3)' }}>Impostazioni</p>
+          <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-3" style={{ color: 'rgba(255,255,255,0.25)' }}>Impostazioni</p>
           <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.025)' }}>
-            <div className="flex items-center gap-3.5 px-4 py-4">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0" style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.2)' }}>
+            <div className="flex items-center gap-3.5 px-4 py-3.5">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0" style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(124,58,237,0.18)' }}>
                 🔔
               </div>
               <div className="flex-1 min-w-0">
@@ -156,14 +184,14 @@ export default function ProfiloPage() {
                 {error && <p className="text-xs mt-0.5" style={{ color: '#EF4444' }}>{error}</p>}
               </div>
               {permission === 'denied' ? (
-                <span className="text-xs font-semibold px-2.5 py-1.5 rounded-xl flex-shrink-0" style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}>Bloccate</span>
+                <span className="text-xs font-semibold px-3 py-1.5 rounded-xl flex-shrink-0" style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}>Bloccate</span>
               ) : subscribed ? (
-                <button onClick={unsubscribe} disabled={loading} className="text-xs font-semibold px-2.5 py-1.5 rounded-xl flex-shrink-0" style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444', opacity: loading ? 0.5 : 1 }}>
-                  {loading ? '...' : 'Disattiva'}
+                <button onClick={unsubscribe} disabled={loading} className="text-xs font-semibold px-3 py-1.5 rounded-xl flex-shrink-0" style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444', opacity: loading ? 0.5 : 1 }}>
+                  {loading ? '…' : 'Disattiva'}
                 </button>
               ) : (
-                <button onClick={subscribe} disabled={loading} className="text-xs font-semibold px-2.5 py-1.5 rounded-xl flex-shrink-0" style={{ background: 'rgba(124,58,237,0.2)', color: '#A78BFA', opacity: loading ? 0.5 : 1 }}>
-                  {loading ? '...' : 'Attiva'}
+                <button onClick={subscribe} disabled={loading} className="text-xs font-semibold px-3 py-1.5 rounded-xl flex-shrink-0" style={{ background: 'rgba(124,58,237,0.18)', color: '#A78BFA', opacity: loading ? 0.5 : 1 }}>
+                  {loading ? '…' : 'Attiva'}
                 </button>
               )}
             </div>
@@ -179,7 +207,7 @@ export default function ProfiloPage() {
           >
             Esci dall&apos;account
           </button>
-          <p className="text-center text-xs mt-5" style={{ color: 'rgba(255,255,255,0.1)' }}>Fidelio · Made with ♥ in Italy</p>
+          <p className="text-center text-xs mt-5" style={{ color: 'rgba(255,255,255,0.1)', letterSpacing: '0.05em' }}>Fidelio · Made with ♥ in Italy</p>
         </div>
       </div>
     </ProtectedLayout>

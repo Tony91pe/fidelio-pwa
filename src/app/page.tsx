@@ -10,18 +10,18 @@ import Link from 'next/link'
 
 function getTier(visits: number) {
   if (visits >= 50) return { label: 'Platino', color: '#E2E8F0', bg: 'rgba(226,232,240,0.12)', emoji: '💎' }
-  if (visits >= 25) return { label: 'Oro', color: '#FBBF24', bg: 'rgba(251,191,36,0.12)', emoji: '🏆' }
+  if (visits >= 25) return { label: 'Oro',     color: '#FBBF24', bg: 'rgba(251,191,36,0.12)',  emoji: '🏆' }
   if (visits >= 10) return { label: 'Argento', color: '#94A3B8', bg: 'rgba(148,163,184,0.12)', emoji: '⭐' }
-  if (visits >= 3)  return { label: 'Bronzo', color: '#CD7C2F', bg: 'rgba(205,124,47,0.12)', emoji: '🎖️' }
+  if (visits >= 3)  return { label: 'Bronzo',  color: '#CD7C2F', bg: 'rgba(205,124,47,0.12)',  emoji: '🎖️' }
   return { label: 'Nuovo', color: '#A78BFA', bg: 'rgba(167,139,250,0.12)', emoji: '✨' }
 }
 
-const CARD_GRADIENTS = [
-  'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
-  'linear-gradient(135deg, #0c1445 0%, #1e3a5f 100%)',
-  'linear-gradient(135deg, #1a0533 0%, #3b0764 100%)',
-  'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-  'linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 100%)',
+const CARD_ACCENTS = [
+  { from: '#1e1b4b', to: '#312e81', accent: '#818CF8' },
+  { from: '#0c1445', to: '#1e3a5f', accent: '#60A5FA' },
+  { from: '#1a0533', to: '#3b0764', accent: '#C084FC' },
+  { from: '#0f172a', to: '#1e293b', accent: '#7C3AED' },
+  { from: '#0d1f2d', to: '#1a3a4a', accent: '#22D3EE' },
 ]
 
 function ShopCard({ shop, index }: { shop: CustomerShop; index: number }) {
@@ -30,75 +30,103 @@ function ShopCard({ shop, index }: { shop: CustomerShop; index: number }) {
   const remaining = Math.max(shop.nextRewardPoints - shop.points, 0)
   const isComplete = remaining === 0
   const tier = getTier(shop.totalVisits)
-  const gradient = CARD_GRADIENTS[index % CARD_GRADIENTS.length]
+  const acc = CARD_ACCENTS[index % CARD_ACCENTS.length]
 
   return (
     <div
       className="relative rounded-3xl overflow-hidden"
       style={{
-        background: gradient,
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+        background: `linear-gradient(140deg, ${acc.from} 0%, ${acc.to} 100%)`,
+        boxShadow: `0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)`,
         animation: `slideUp 0.5s cubic-bezier(0.16,1,0.3,1) ${index * 0.08}s both`,
-        minHeight: 160,
+        minHeight: 168,
       }}
     >
-      {/* Glow decorativo */}
-      <div className="absolute top-0 right-0 w-48 h-48 pointer-events-none" style={{ background: cfg.color + '18', filter: 'blur(50px)', transform: 'translate(20%,-20%)' }} />
-      <div className="absolute bottom-0 left-0 w-32 h-32 pointer-events-none" style={{ background: 'rgba(124,58,237,0.1)', filter: 'blur(40px)', transform: 'translate(-20%,20%)' }} />
+      {/* Glow blob top-right */}
+      <div className="absolute top-0 right-0 w-52 h-52 pointer-events-none" style={{ background: acc.accent + '20', filter: 'blur(56px)', transform: 'translate(25%,-25%)' }} />
+      {/* Glow blob bottom-left */}
+      <div className="absolute bottom-0 left-0 w-36 h-36 pointer-events-none" style={{ background: cfg.color + '18', filter: 'blur(44px)', transform: 'translate(-25%,25%)' }} />
+      {/* Category watermark */}
+      <div className="absolute right-4 bottom-4 text-[72px] opacity-[0.06] pointer-events-none select-none" style={{ filter: 'grayscale(1)' }}>
+        {cfg.emoji}
+      </div>
 
-      <div className="relative p-5">
-        {/* Top row */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-2.5">
+      <div className="relative p-5 h-full flex flex-col gap-3">
+        {/* Top: shop info + points */}
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
             <div
-              className="w-10 h-10 rounded-2xl flex items-center justify-center text-lg flex-shrink-0"
-              style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}
+              className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl flex-shrink-0"
+              style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}
             >
               {cfg.emoji}
             </div>
             <div>
-              <p className="font-bold text-base leading-tight text-white">{shop.shopName}</p>
-              <div className="flex items-center gap-1.5 mt-0.5">
+              <p className="font-bold text-[15px] leading-tight text-white">{shop.shopName}</p>
+              <div className="flex items-center gap-2 mt-1">
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: tier.bg, color: tier.color }}>
                   {tier.emoji} {tier.label}
                 </span>
-                <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>{shop.totalVisits} visite</span>
+                <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.28)' }}>{shop.totalVisits} visite</span>
               </div>
             </div>
           </div>
 
-          {/* Punti */}
-          <div className="text-right">
-            <p className="font-black text-3xl leading-none" style={{ color: isComplete ? '#FBBF24' : 'white' }}>{shop.points}</p>
-            <p className="text-[10px] font-medium mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>punti</p>
+          {/* Points badge */}
+          <div className="text-right flex-shrink-0">
+            <p
+              className="font-black text-4xl leading-none tracking-tight"
+              style={{ color: isComplete ? '#FBBF24' : 'white', textShadow: isComplete ? '0 0 20px rgba(251,191,36,0.4)' : 'none' }}
+            >
+              {shop.points}
+            </p>
+            <p className="text-[10px] font-semibold mt-0.5 tracking-wide uppercase" style={{ color: 'rgba(255,255,255,0.28)' }}>punti</p>
           </div>
         </div>
 
         {/* Progress bar */}
-        <div>
-          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+        <div className="mt-auto">
+          {/* Labels */}
+          <div className="flex justify-between items-center mb-1.5">
+            <p className="text-[11px] font-medium" style={{ color: isComplete ? '#FBBF24' : 'rgba(255,255,255,0.38)' }}>
+              {isComplete ? '🎉 Premio disponibile!' : `Ancora ${remaining} punti al premio`}
+            </p>
+            <p className="text-[10px] font-bold tabular-nums" style={{ color: isComplete ? '#FBBF24' : acc.accent + 'AA' }}>{Math.round(pct)}%</p>
+          </div>
+          {/* Bar track */}
+          <div className="relative h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.07)' }}>
             <div
               className="h-full rounded-full transition-all duration-1000"
               style={{
                 width: `${pct}%`,
                 background: isComplete
-                  ? 'linear-gradient(90deg, #FBBF24, #F59E0B)'
-                  : `linear-gradient(90deg, ${cfg.color}, ${cfg.color}99)`,
-                boxShadow: isComplete ? '0 0 8px rgba(251,191,36,0.5)' : undefined,
+                  ? 'linear-gradient(90deg, #FBBF24, #F97316)'
+                  : `linear-gradient(90deg, ${acc.accent}, ${acc.accent}88)`,
+                boxShadow: isComplete ? `0 0 10px rgba(251,191,36,0.6)` : `0 0 8px ${acc.accent}55`,
               }}
             />
           </div>
-          <div className="flex justify-between items-center mt-2">
-            <p className="text-[11px] font-medium" style={{ color: isComplete ? '#FBBF24' : 'rgba(255,255,255,0.4)' }}>
-              {isComplete ? '🎉 Premio disponibile! Vai al negozio' : `Ancora ${remaining} punti al prossimo premio`}
-            </p>
-            <p className="text-[10px] font-bold" style={{ color: isComplete ? '#FBBF24' : 'rgba(255,255,255,0.2)' }}>{Math.round(pct)}%</p>
+          {/* Milestone dots */}
+          <div className="flex justify-between mt-1.5 px-0">
+            {[25, 50, 75].map(p => (
+              <div key={p} className="w-px h-1 rounded-full" style={{ background: pct >= p ? acc.accent + '66' : 'rgba(255,255,255,0.1)' }} />
+            ))}
           </div>
         </div>
       </div>
     </div>
   )
 }
+
+const QrSvg = () => (
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+    <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+    <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+    <rect x="14" y="14" width="3" height="3" rx="0.5"/>
+    <path d="M18 14v1M21 14v3h-3M21 21h-3v-3"/>
+  </svg>
+)
 
 export default function HomePage() {
   const { customer } = useAuthStore()
@@ -131,58 +159,81 @@ export default function HomePage() {
 
         {/* Header */}
         <div
-          className="relative overflow-hidden px-5 pt-12 pb-8"
+          className="relative overflow-hidden px-5 pt-12 pb-7"
           style={{
-            background: 'linear-gradient(180deg, rgba(109,40,217,0.25) 0%, transparent 100%)',
+            background: 'linear-gradient(180deg, rgba(109,40,217,0.22) 0%, transparent 100%)',
             animation: 'slideUp 0.4s cubic-bezier(0.16,1,0.3,1) both',
           }}
         >
-          <div className="absolute top-0 left-0 right-0 h-40 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124,58,237,0.2) 0%, transparent 100%)' }} />
+          <div className="absolute top-0 left-0 right-0 h-44 pointer-events-none" style={{ background: 'radial-gradient(ellipse 90% 70% at 50% 0%, rgba(124,58,237,0.22) 0%, transparent 100%)' }} />
 
-          <div className="flex items-center justify-between mb-8">
+          {/* Greeting row */}
+          <div className="flex items-center justify-between mb-7">
             <div>
-              <p className="text-xs font-medium mb-0.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.04em' }}>{greeting} 👋</p>
-              <h1 className="font-display font-bold text-2xl">{firstName}</h1>
+              <p className="text-xs font-medium mb-0.5" style={{ color: 'rgba(255,255,255,0.38)', letterSpacing: '0.05em' }}>{greeting} 👋</p>
+              <h1 className="font-display font-bold text-2xl leading-none">{firstName}</h1>
             </div>
             <Link href="/profilo">
               <div
-                className="w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-base"
-                style={{ background: 'linear-gradient(135deg, #7C3AED, #3B82F6)', boxShadow: '0 4px 16px rgba(124,58,237,0.45)' }}
+                className="w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-base active:scale-90 transition-transform"
+                style={{
+                  background: 'linear-gradient(135deg, #7C3AED, #3B82F6)',
+                  boxShadow: '0 4px 16px rgba(124,58,237,0.45), 0 0 0 1px rgba(167,139,250,0.2)',
+                }}
               >
                 {firstName[0]?.toUpperCase()}
               </div>
             </Link>
           </div>
 
-          {/* Punti totali hero */}
+          {/* Points hero */}
           <div className="text-center mb-6">
-            <p className="text-xs font-semibold mb-2 tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.35)' }}>Punti totali</p>
-            <p className="font-display font-black leading-none" style={{ fontSize: 72, color: 'white', textShadow: '0 0 40px rgba(167,139,250,0.4)' }}>{totalPoints}</p>
-            <div className="flex items-center justify-center gap-4 mt-3">
+            <p className="text-[10px] font-bold mb-2 tracking-[0.2em] uppercase" style={{ color: 'rgba(255,255,255,0.28)' }}>Punti totali</p>
+            <div className="relative inline-block">
+              <p
+                className="font-display font-black leading-none"
+                style={{ fontSize: 76, color: 'white', textShadow: '0 0 50px rgba(167,139,250,0.35)' }}
+              >
+                {totalPoints}
+              </p>
+              {/* Glow beneath number */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-4 pointer-events-none" style={{ background: 'rgba(124,58,237,0.35)', filter: 'blur(16px)' }} />
+            </div>
+            <div className="flex items-center justify-center gap-5 mt-4">
               <div className="text-center">
-                <p className="font-bold text-lg" style={{ color: '#60A5FA' }}>{shopsData?.length ?? 0}</p>
-                <p className="text-[10px] tracking-wider uppercase" style={{ color: 'rgba(255,255,255,0.3)' }}>Negozi</p>
+                <p className="font-bold text-xl leading-none" style={{ color: '#60A5FA' }}>{shopsData?.length ?? 0}</p>
+                <p className="text-[10px] tracking-widest uppercase mt-1" style={{ color: 'rgba(255,255,255,0.28)' }}>Negozi</p>
               </div>
-              <div className="w-px h-6" style={{ background: 'rgba(255,255,255,0.1)' }} />
+              <div className="w-px h-7" style={{ background: 'rgba(255,255,255,0.08)' }} />
               <div className="text-center">
-                <p className="font-bold text-lg" style={{ color: '#F0ABFC' }}>{totalVisits}</p>
-                <p className="text-[10px] tracking-wider uppercase" style={{ color: 'rgba(255,255,255,0.3)' }}>Visite</p>
+                <p className="font-bold text-xl leading-none" style={{ color: '#F0ABFC' }}>{totalVisits}</p>
+                <p className="text-[10px] tracking-widest uppercase mt-1" style={{ color: 'rgba(255,255,255,0.28)' }}>Visite</p>
               </div>
             </div>
           </div>
 
-          {/* Codice + QR button */}
+          {/* Codice + scan button */}
           <div className="flex items-center gap-3">
-            <div className="flex-1 px-4 py-3 rounded-2xl" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <p className="text-[10px] tracking-widest uppercase mb-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>Il tuo codice</p>
+            <div
+              className="flex-1 px-4 py-3 rounded-2xl"
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              <p className="text-[10px] tracking-widest uppercase mb-0.5" style={{ color: 'rgba(255,255,255,0.28)' }}>Il tuo codice</p>
               <p className="font-mono font-bold text-base tracking-wider text-white">{code}</p>
             </div>
             <Link href="/scan">
               <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform"
-                style={{ background: 'linear-gradient(135deg, #7C3AED, #6D28D9)', boxShadow: '0 4px 16px rgba(124,58,237,0.45)' }}
+                className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform"
+                style={{
+                  background: 'linear-gradient(135deg, #7C3AED, #5B21B6)',
+                  boxShadow: '0 4px 20px rgba(124,58,237,0.55), 0 0 0 1px rgba(167,139,250,0.15)',
+                }}
               >
-                <span style={{ fontSize: 24 }}>⬛</span>
+                <QrSvg />
               </div>
             </Link>
           </div>
@@ -190,36 +241,59 @@ export default function HomePage() {
 
         {/* Quick actions */}
         <div className="px-5 mb-6" style={{ animation: 'slideUp 0.4s cubic-bezier(0.16,1,0.3,1) 0.05s both' }}>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-4 gap-2.5">
             {[
-              { href: '/scan', icon: '📲', label: 'Il mio QR', color: '#7C3AED' },
-              { href: '/premi', icon: '🎁', label: 'Premi', color: '#0EA5E9' },
-              { href: '/offerte', icon: '🔥', label: 'Offerte', color: '#F59E0B' },
+              {
+                href: '/scan', label: 'Il mio QR', color: '#7C3AED',
+                icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="3" height="3" rx="0.5"/><path d="M18 14v1M21 14v3h-3M21 21h-3v-3"/></svg>,
+              },
+              {
+                href: '/premi', label: 'Premi', color: '#0EA5E9',
+                icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5" rx="1"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>,
+              },
+              {
+                href: '/offerte', label: 'Offerte', color: '#F59E0B',
+                icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>,
+              },
+              {
+                href: '/storico', label: 'Storico', color: '#10B981',
+                icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+              },
             ].map(({ href, icon, label, color }) => (
               <Link key={href} href={href}>
                 <div
-                  className="py-4 rounded-2xl text-center active:scale-95 transition-transform"
-                  style={{ background: color + '15', border: `1px solid ${color}25` }}
+                  className="py-3.5 rounded-2xl text-center active:scale-95 transition-transform flex flex-col items-center gap-2"
+                  style={{
+                    background: color + '12',
+                    border: `1px solid ${color}22`,
+                  }}
                 >
-                  <div className="text-2xl mb-1.5">{icon}</div>
-                  <p className="text-[11px] font-bold tracking-wide" style={{ color: 'rgba(255,255,255,0.65)' }}>{label}</p>
+                  <div style={{ color }}>{icon}</div>
+                  <p className="text-[10px] font-bold tracking-wide" style={{ color: 'rgba(255,255,255,0.6)' }}>{label}</p>
                 </div>
               </Link>
             ))}
           </div>
         </div>
 
-        {/* I miei negozi */}
+        {/* Le mie carte fedeltà */}
         <div className="px-5">
           <div className="flex items-center justify-between mb-4" style={{ animation: 'slideUp 0.4s cubic-bezier(0.16,1,0.3,1) 0.1s both' }}>
-            <h2 className="font-bold text-base">Le mie carte fedeltà</h2>
+            <div>
+              <h2 className="font-bold text-base">Le mie carte fedeltà</h2>
+              {shopsData && shopsData.length > 0 && (
+                <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>{shopsData.length} {shopsData.length === 1 ? 'negozio attivo' : 'negozi attivi'}</p>
+              )}
+            </div>
             <Link href="/scopri" className="text-xs font-semibold" style={{ color: '#A78BFA' }}>Scopri altri →</Link>
           </div>
 
           {isLoading ? (
             <div className="flex flex-col gap-3">
               {[1, 2].map((i) => (
-                <div key={i} className="rounded-3xl h-40 animate-pulse" style={{ background: 'rgba(255,255,255,0.04)' }} />
+                <div key={i} className="rounded-3xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', height: 168 }}>
+                  <div className="h-full animate-pulse" style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%)', backgroundSize: '200% 100%' }} />
+                </div>
               ))}
             </div>
           ) : !shopsData?.length ? (
