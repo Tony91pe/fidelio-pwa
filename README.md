@@ -1,102 +1,134 @@
-# Fidelio PWA — Cliente
+<p align="center">
+  <img src="/public/logo.png" width="120" alt="Fidelio Logo" />
+</p>
 
-PWA per i clienti Fidelio. Login via OTP email, QR personale, mappa negozi, premi.
+<h1 align="center">Fidelio — Loyalty Platform for Local Shops (PWA)</h1>
 
-## Stack
+<p align="center">
+  Modern PWA for collecting points, redeeming rewards, and exploring nearby shops.
+</p>
 
-- Next.js 14 App Router
-- React 18 + TypeScript
-- TailwindCSS
-- React Query (TanStack)
-- Zustand
-- next-pwa
-- Leaflet (mappa)
-- jsQR (scanner QR via Web API)
-- QRCode (generazione QR)
+---
 
-## Setup
+## 🚀 Overview
+
+**Fidelio** is a modern loyalty platform designed for local shops.  
+Customers can collect points, redeem rewards, and explore nearby stores — all through a fast, installable **PWA** built with **Next.js 14**.
+
+The platform includes:
+
+- Customer PWA  
+- QR-based reward system  
+- Wallet with personal QR  
+- Map with nearby shops  
+- Rewards & gift cards  
+- Email OTP authentication  
+
+---
+
+## ✨ Features
+
+- **Email OTP login** (no password required)  
+- **QR code scanner** for point collection  
+- **Customer wallet** with personal QR  
+- **Rewards & gift cards**  
+- **Interactive map** with Leaflet  
+- **Offline-ready PWA**  
+- **Fast UI** with Tailwind CSS  
+- **State management** with Zustand  
+- **Data fetching** with React Query  
+
+---
+
+## 🧱 Tech Stack
+
+- **Next.js 14 (App Router)**
+- **React 18**
+- **TypeScript**
+- **Tailwind CSS**
+- **Zustand**
+- **React Query**
+- **next-pwa**
+- **Leaflet**
+- **jsQR**
+
+---
+
+## 🌐 Live Website
+
+👉 **https://getfidelio.com**
+
+---
+
+## 📦 Installation
 
 ```bash
 npm install
-cp .env.local.example .env.local
-# Modifica NEXT_PUBLIC_API_URL con l'URL del backend Fidelio
 npm run dev
-```
 
-## Variabili d'ambiente
 
-```
-NEXT_PUBLIC_API_URL=https://fidelio-web-git-main-tony91pes-projects.vercel.app
-```
+---
 
-## API Backend necessarie
+🗂 Project Structure
 
-La PWA richiede questi endpoint sul backend Fidelio:
+/app
+  /auth
+  /wallet
+  /rewards
+  /map
+/components
+/hooks
+/lib
+/public
 
-### Auth cliente (da aggiungere)
-- `POST /api/customer/auth/send-otp` — body: `{ email }` → invia OTP via email
-- `POST /api/customer/auth/verify-otp` — body: `{ email, code }` → restituisce `{ token, customer }`
 
-### Dati cliente (da aggiungere)
-- `GET /api/customer/me` — header: `Authorization: Bearer <token>` → restituisce cliente
-- `GET /api/customer/rewards?email=` → premi riscattati
-- `GET /api/customer/giftcards?email=` → gift card
+---
 
-### Già esistenti
-- `GET /api/app/customer-shops?email=` → negozi con punti
-- `GET /api/app/shops` → tutti i negozi
-- `GET /api/app/my-code?email=` → codice QR cliente
+🔐 Authentication
 
-## Deploy su Vercel
+Fidelio uses email-based OTP authentication for a frictionless login experience.
 
-```bash
-vercel --prod
-```
+---
 
-## Struttura cartelle
+📱 PWA Support
 
-```
-src/
-  app/
-    page.tsx          # Home - punti e negozi
-    login/page.tsx    # Login OTP
-    scopri/page.tsx   # Mappa negozi
-    premi/page.tsx    # Premi e gift card
-    offerte/page.tsx  # Offerte in corso
-    scan/page.tsx     # QR scanner + mostra QR
-    profilo/page.tsx  # Profilo utente
-    globals.css
-    layout.tsx
-  components/
-    AuthInit.tsx
-    BottomNav.tsx
-    MapComponent.tsx
-    ProtectedLayout.tsx
-  lib/
-    api.ts
-    categories.ts
-    queryProvider.tsx
-  store/
-    authStore.ts
-  types/
-    index.ts
-```
+• Installable on iOS, Android, Desktop
+• Offline caching
+• Manifest + service worker
+• Optimized Lighthouse score
 
-## Note importanti
 
-### Scanner QR
-Lo scanner usa `jsQR` + Web API (getUserMedia) — nessuna libreria nativa.
-Funziona su iOS Safari ≥ 14.3 e tutti i browser moderni.
+---
 
-### Mappa
-Leaflet con tile CartoDB Dark. Se i negozi non hanno lat/lng nel DB,
-la mappa non mostrerà marker. Aggiungi lat/lng allo schema Prisma se necessario.
+📸 QR Scanner
 
-### OTP Backend
-Devi aggiungere gli endpoint OTP al backend Fidelio.
-Usa Resend (già configurato) per inviare l'email con il codice.
-Usa Redis o un campo DB per memorizzare il codice temporaneo.
+The app includes a built‑in QR scanner using:
 
-### PWA Icons
-Genera le icone in `/public/icons/` nelle dimensioni indicate nel manifest.json.
-Puoi usare https://realfavicongenerator.net/
+• jsQR for decoding
+• camera stream via browser APIs
+• real‑time validation
+
+
+---
+
+🗺 Map Integration
+
+Built with Leaflet, showing:
+
+• nearby shops
+• shop details
+• reward availability
+
+
+---
+
+📄 License
+
+Private project — all rights reserved.
+
+---
+
+👤 Author
+
+Antonio
+Founder of Fidelio
