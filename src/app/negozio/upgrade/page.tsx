@@ -66,7 +66,7 @@ export default function UpgradePage() {
   const currentPlan = shop?.plan ?? 'STARTER'
 
   function handleUpgrade(planId: string) {
-    window.open('https://fidelio-web.vercel.app/dashboard/upgrade', '_blank')
+    window.open('https://www.getfidelio.app/dashboard/upgrade', '_blank')
   }
 
   return (
