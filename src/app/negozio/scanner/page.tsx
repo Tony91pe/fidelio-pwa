@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { ShopProtectedLayout } from '@/components/ShopProtectedLayout'
 import { useShopAuthStore } from '@/store/shopAuthStore'
-import { shopCheckin, scanShopGiftCard, useShopGiftCard } from '@/lib/api'
+import { shopCheckin, shopRedeem, scanShopGiftCard, useShopGiftCard } from '@/lib/api'
 import axios from 'axios'
 
 type ScanMode = 'cliente' | 'giftcard'
@@ -15,6 +15,11 @@ interface CheckinResult {
   pointsAdded: number
   totalPoints: number
   isFirstVisit: boolean
+  rewardAvailable: boolean
+  rewardDescription: string
+  rewardThreshold: number
+  rewardId: string | null
+  customerId: string
 }
 
 interface GiftCardResult {
@@ -36,6 +41,8 @@ export default function ShopScannerPage() {
   const [giftCardResult, setGiftCardResult] = useState<GiftCardResult | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showRewardDialog, setShowRewardDialog] = useState(false)
+  const [redeemLoading, setRedeemLoading] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -114,6 +121,8 @@ export default function ShopScannerPage() {
     setCheckinResult(null)
     setGiftCardResult(null)
     setErrorMsg('')
+    setShowRewardDialog(false)
+    setRedeemLoading(false)
   }
 
   async function handleGiftCardScan(code: string) {
@@ -139,8 +148,12 @@ export default function ShopScannerPage() {
     try {
       const amountVal = amount ? parseFloat(amount) : undefined
       const res = await shopCheckin(scannedCode, amountVal)
-      setCheckinResult(res.data)
+      const data: CheckinResult = res.data
+      setCheckinResult(data)
       setScanState('success')
+      if (data.rewardAvailable) {
+        setShowRewardDialog(true)
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setErrorMsg(err.response?.data?.error || 'Cliente non trovato')
@@ -150,6 +163,20 @@ export default function ShopScannerPage() {
       setScanState('error')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleRedeemNow() {
+    if (!checkinResult) return
+    setRedeemLoading(true)
+    try {
+      await shopRedeem(checkinResult.customerCode, checkinResult.rewardId)
+      setShowRewardDialog(false)
+    } catch {
+      // silently dismiss dialog on error — points were already assigned
+      setShowRewardDialog(false)
+    } finally {
+      setRedeemLoading(false)
     }
   }
 
@@ -437,6 +464,48 @@ export default function ShopScannerPage() {
                   Scansiona ancora
                 </button>
               </div>
+
+              {/* Reward dialog overlay */}
+              {showRewardDialog && checkinResult && (
+                <div className="absolute inset-0 flex items-end justify-center p-4 pb-6" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
+                  <div
+                    className="w-full max-w-sm rounded-3xl p-6"
+                    style={{ background: 'linear-gradient(135deg, #1A0F3A, #2D1B69)', border: '1px solid rgba(245,158,11,0.4)', boxShadow: '0 -8px 40px rgba(245,158,11,0.2)' }}
+                  >
+                    <div className="text-center mb-5">
+                      <div className="text-4xl mb-2">🎁</div>
+                      <h3 className="font-display font-bold text-lg">Premio disponibile!</h3>
+                      <p className="text-sm mt-1.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                        {checkinResult.customerName} ha abbastanza punti per:
+                      </p>
+                      <p className="font-semibold mt-2 px-3 py-2 rounded-xl text-sm" style={{ background: 'rgba(245,158,11,0.15)', color: '#FBBF24', border: '1px solid rgba(245,158,11,0.3)' }}>
+                        {checkinResult.rewardDescription}
+                      </p>
+                    </div>
+                    <p className="text-xs text-center mb-4" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                      Vuoi riscattare il premio adesso?
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setShowRewardDialog(false)}
+                        disabled={redeemLoading}
+                        className="flex-1 py-3 rounded-xl font-semibold text-sm"
+                        style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)' }}
+                      >
+                        Dopo
+                      </button>
+                      <button
+                        onClick={handleRedeemNow}
+                        disabled={redeemLoading}
+                        className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all active:scale-95"
+                        style={{ background: redeemLoading ? 'rgba(245,158,11,0.3)' : 'linear-gradient(135deg, #F59E0B, #F97316)', boxShadow: '0 4px 14px rgba(245,158,11,0.4)', color: 'white' }}
+                      >
+                        {redeemLoading ? '...' : '🎁 Ritira ora'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

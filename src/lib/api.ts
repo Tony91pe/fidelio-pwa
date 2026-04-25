@@ -113,6 +113,9 @@ export const getShopStats = () =>
 export const shopCheckin = (customerCode: string, amount?: number) =>
   shopApi.post('/api/shop/checkin', { customerCode, amount })
 
+export const shopRedeem = (customerCode: string, rewardId?: string | null) =>
+  shopApi.post('/api/shop/redeem', { customerCode, rewardId })
+
 // ─── Shop Customers ──────────────────────────────────────────────────────────
 export const getShopCustomers = (search?: string) =>
   shopApi.get('/api/shop/customers', { params: search ? { search } : {} })
