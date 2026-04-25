@@ -4,8 +4,23 @@ import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/authStore'
 import { getRewards, getGiftCards, getShops } from '@/lib/api'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { CustomerShop } from '@/types'
+import QRCode from 'qrcode'
+
+function GiftCardQR({ code }: { code: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  useEffect(() => {
+    if (canvasRef.current) {
+      QRCode.toCanvas(canvasRef.current, code, {
+        width: 120,
+        margin: 1,
+        color: { dark: '#1A0F3A', light: '#F5F3FF' },
+      })
+    }
+  }, [code])
+  return <canvas ref={canvasRef} style={{ borderRadius: 8, display: 'block' }} />
+}
 
 export default function PremiPage() {
   const { customer } = useAuthStore()
@@ -216,6 +231,15 @@ export default function PremiPage() {
 
                       <p className="font-mono text-sm tracking-[0.2em]" style={{ color: 'rgba(255,255,255,0.7)' }}>{gc.code}</p>
                       {gc.description && <p className="text-xs mt-1.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{gc.description}</p>}
+
+                      {!used && (
+                        <div className="mt-4 flex flex-col items-center gap-2">
+                          <div className="p-2 rounded-xl" style={{ background: '#F5F3FF' }}>
+                            <GiftCardQR code={gc.code} />
+                          </div>
+                          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Mostra al negozio per usarla</p>
+                        </div>
+                      )}
 
                       {used && (
                         <div className="absolute inset-0 flex items-center justify-center">
