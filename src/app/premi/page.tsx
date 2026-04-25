@@ -2,13 +2,23 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/authStore'
-import { getRewards, getGiftCards } from '@/lib/api'
+import { getRewards, getGiftCards, getShops } from '@/lib/api'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
 import { useState } from 'react'
+import { CustomerShop } from '@/types'
 
 export default function PremiPage() {
   const { customer } = useAuthStore()
   const [tab, setTab] = useState<'premi' | 'giftcard'>('premi')
+
+  const { data: shops = [] } = useQuery({
+    queryKey: ['customer-shops', customer?.email],
+    queryFn: () => getShops(),
+    enabled: !!customer?.email,
+    select: (res) => res.data as CustomerShop[],
+  })
+
+  const availableRewards = shops.filter((s) => s.points >= s.nextRewardPoints)
 
   const { data: rewards = [], isLoading: loadingRewards } = useQuery({
     queryKey: ['rewards', customer?.email],
@@ -67,7 +77,39 @@ export default function PremiPage() {
             <div className="flex flex-col gap-3">
               {[1, 2, 3].map((i) => <div key={i} className="rounded-2xl h-20 animate-pulse" style={{ background: 'rgba(255,255,255,0.03)' }} />)}
             </div>
-          ) : rewards.length === 0 ? (
+          ) : (
+          <>
+            {/* Premi da riscattare */}
+            {availableRewards.length > 0 && (
+              <div className="mb-6" style={{ animation: 'slideUp 0.4s cubic-bezier(0.16,1,0.3,1) 0.05s both' }}>
+                <p className="text-xs font-bold mb-3 tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.35)' }}>Da riscattare</p>
+                <div className="flex flex-col gap-3">
+                  {availableRewards.map((shop) => (
+                    <div
+                      key={shop.shopId}
+                      className="flex items-center gap-3 p-4 rounded-2xl"
+                      style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(249,115,22,0.08))', border: '1px solid rgba(245,158,11,0.25)' }}
+                    >
+                      <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: 'rgba(245,158,11,0.15)' }}>🎉</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-sm truncate">{shop.shopName}</p>
+                        <p className="text-xs mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.5)' }}>{shop.rewardDescription}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-xs font-bold" style={{ color: '#FBBF24' }}>{shop.points} pt</p>
+                        <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>Mostra QR al negozio</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 p-3 rounded-xl text-center text-xs" style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.4)' }}>
+                  💡 Mostra il tuo codice QR al negozio per riscattare il premio
+                </div>
+              </div>
+            )}
+
+            {/* Premi già riscattati */}
+            {rewards.length === 0 && availableRewards.length === 0 ? (
             <div
               className="rounded-2xl p-10 text-center"
               style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.08)', animation: 'slideUp 0.4s cubic-bezier(0.16,1,0.3,1) 0.1s both' }}
@@ -76,7 +118,7 @@ export default function PremiPage() {
               <p className="font-semibold text-sm mb-1">Nessun premio ancora</p>
               <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>Accumula punti nei negozi Fidelio per sbloccare premi</p>
             </div>
-          ) : (
+            ) : rewards.length > 0 && (
             <div
               className="rounded-2xl px-4"
               style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', animation: 'slideUp 0.4s cubic-bezier(0.16,1,0.3,1) 0.1s both' }}
@@ -104,6 +146,8 @@ export default function PremiPage() {
                 </div>
               ))}
             </div>
+            )}
+          </>
           )
         )}
 

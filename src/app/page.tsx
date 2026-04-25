@@ -112,6 +112,17 @@ function ShopCard({ shop, index }: { shop: CustomerShop; index: number }) {
               <div key={p} className="w-px h-1 rounded-full" style={{ background: pct >= p ? acc.accent + '66' : 'rgba(255,255,255,0.1)' }} />
             ))}
           </div>
+          {/* Claim button — visible only when reward is ready */}
+          {isComplete && (
+            <Link href="/premi" className="block mt-3">
+              <div
+                className="w-full py-2 rounded-xl text-center text-[12px] font-bold active:scale-95 transition-transform"
+                style={{ background: 'linear-gradient(90deg, #F59E0B, #F97316)', color: 'white', boxShadow: '0 4px 12px rgba(245,158,11,0.4)' }}
+              >
+                Vai ai premi →
+              </div>
+            </Link>
+          )}
         </div>
       </div>
     </div>
