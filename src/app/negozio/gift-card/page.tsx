@@ -122,7 +122,7 @@ export default function ShopGiftCardPage() {
 
   const [showForm, setShowForm] = useState(false)
   const [filter, setFilter] = useState<'all' | 'active' | 'used'>('active')
-  const [formData, setFormData] = useState({ value: '', description: '', customerEmail: '' })
+  const [formData, setFormData] = useState({ value: '', description: '', customerEmail: '', customerName: '', dedica: '' })
   const [formError, setFormError] = useState('')
 
   // Modal uso parziale
@@ -140,13 +140,14 @@ export default function ShopGiftCardPage() {
       value: parseFloat(formData.value),
       description: formData.description || undefined,
       customerEmail: formData.customerEmail || undefined,
+      customerName: formData.customerName || undefined,
+      dedica: formData.dedica || undefined,
     }),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['shop-gift-cards'] })
       setShowForm(false)
-      setFormData({ value: '', description: '', customerEmail: '' })
+      setFormData({ value: '', description: '', customerEmail: '', customerName: '', dedica: '' })
       setFormError('')
-      // Condividi subito dopo la creazione
       const card = res.data
       handleShareCard(card.code, card.value, card.description)
     },
@@ -327,14 +328,25 @@ export default function ShopGiftCardPage() {
                   min="0.01" step="0.01" autoFocus />
               </div>
               <div>
-                <label className="text-xs font-medium mb-1.5 block" style={{ color: 'rgba(255,255,255,0.5)' }}>Descrizione (opzionale)</label>
-                <input type="text" placeholder="es. Regalo di compleanno" value={formData.description}
-                  onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))} />
+                <label className="text-xs font-medium mb-1.5 block" style={{ color: 'rgba(255,255,255,0.5)' }}>Intestazione — Per chi è (opzionale)</label>
+                <input type="text" placeholder="es. Marco Rossi" value={formData.customerName}
+                  onChange={(e) => setFormData((p) => ({ ...p, customerName: e.target.value }))} />
               </div>
               <div>
                 <label className="text-xs font-medium mb-1.5 block" style={{ color: 'rgba(255,255,255,0.5)' }}>Email cliente (opzionale)</label>
                 <input type="email" placeholder="cliente@email.com" value={formData.customerEmail}
                   onChange={(e) => setFormData((p) => ({ ...p, customerEmail: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-xs font-medium mb-1.5 block" style={{ color: 'rgba(255,255,255,0.5)' }}>Descrizione (opzionale)</label>
+                <input type="text" placeholder="es. Regalo di compleanno" value={formData.description}
+                  onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-xs font-medium mb-1.5 block" style={{ color: 'rgba(255,255,255,0.5)' }}>Dedica (opzionale)</label>
+                <textarea placeholder="Scrivi un messaggio personale..." value={formData.dedica}
+                  onChange={(e) => setFormData((p) => ({ ...p, dedica: e.target.value }))}
+                  rows={2} style={{ width: '100%', resize: 'none' }} />
               </div>
               {formError && <p className="text-sm" style={{ color: '#F87171' }}>{formError}</p>}
               <p className="text-[11px] text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>
