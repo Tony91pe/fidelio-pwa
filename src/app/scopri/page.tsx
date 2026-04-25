@@ -251,6 +251,16 @@ export default function ScopriPage() {
 
         {view === 'map' ? (
           <div className="flex-1 relative">
+            {!isLoading && filtered.length > 0 && filtered.every(s => !s.lat || !s.lng) ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-8 text-center" style={{ zIndex: 10 }}>
+                <p className="text-4xl">📍</p>
+                <p className="font-semibold text-sm">Coordinate non ancora impostate</p>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>I negozi sono presenti ma le coordinate GPS non sono ancora state calcolate. Usa la vista lista.</p>
+                <button onClick={() => setView('list')} className="mt-1 px-4 py-2 rounded-xl text-sm font-semibold" style={{ background: 'rgba(124,58,237,0.3)', color: '#A78BFA', border: '1px solid rgba(124,58,237,0.4)' }}>
+                  Vedi lista →
+                </button>
+              </div>
+            ) : null}
             <MapComponent
               shops={filtered}
               selectedShop={selectedShop}
