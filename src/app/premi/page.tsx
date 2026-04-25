@@ -201,10 +201,17 @@ export default function PremiPage() {
                   >
                     <div className="absolute top-0 right-0 w-32 h-32 rounded-full pointer-events-none" style={{ background: 'rgba(167,139,250,0.1)', filter: 'blur(30px)', transform: 'translate(30%,-30%)' }} />
                     <div className="relative p-5">
+                      {/* Header: logo + nome negozio + valore */}
                       <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <p className="text-[10px] font-medium mb-0.5" style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Gift Card</p>
-                          <p className="font-semibold text-base">{gc.shopName}</p>
+                        <div className="flex items-center gap-2.5">
+                          {gc.shopLogo
+                            ? <img src={gc.shopLogo} alt={gc.shopName} style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }} />
+                            : <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(167,139,250,0.2)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🎁</div>
+                          }
+                          <div>
+                            <p className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Gift Card</p>
+                            <p className="font-semibold text-sm leading-tight">{gc.shopName}</p>
+                          </div>
                         </div>
                         <div className="text-right">
                           {gc.value ? (
@@ -221,6 +228,13 @@ export default function PremiPage() {
                         </div>
                       </div>
 
+                      {/* Intestazione: per chi è */}
+                      {gc.customerName && (
+                        <p className="text-xs mb-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                          Per: <span className="font-semibold text-white">{gc.customerName}</span>
+                        </p>
+                      )}
+
                       {gc.value && !used && (
                         <div className="mb-3">
                           <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
@@ -231,6 +245,14 @@ export default function PremiPage() {
 
                       <p className="font-mono text-sm tracking-[0.2em]" style={{ color: 'rgba(255,255,255,0.7)' }}>{gc.code}</p>
                       {gc.description && <p className="text-xs mt-1.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{gc.description}</p>}
+
+                      {/* Dedica */}
+                      {gc.dedica && (
+                        <div className="mt-2 px-3 py-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.05)', borderLeft: '2px solid rgba(167,139,250,0.4)' }}>
+                          <p className="text-[10px] mb-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>Dedica</p>
+                          <p className="text-xs italic" style={{ color: 'rgba(255,255,255,0.7)' }}>"{gc.dedica}"</p>
+                        </div>
+                      )}
 
                       {!used && (
                         <div className="mt-4 flex flex-col items-center gap-2">
