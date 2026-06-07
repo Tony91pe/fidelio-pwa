@@ -3,6 +3,7 @@ import { Outfit, Syne } from 'next/font/google'
 import './globals.css'
 import { QueryProvider } from '@/lib/queryProvider'
 import { AuthInit } from '@/components/AuthInit'
+import { CrispChat } from '@/components/CrispChat'
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans bg-surface text-white antialiased">
         <QueryProvider>
           <AuthInit />
+          <CrispChat />
           {children}
         </QueryProvider>
       </body>

@@ -62,6 +62,12 @@ export const sendOTP = (email: string) =>
 export const verifyOTP = (email: string, code: string) =>
   api.post('/api/customer/auth/verify-otp', { email, code })
 
+export const loginWithPassword = (email: string, password: string) =>
+  api.post('/api/customer/auth/login-password', { email, password })
+
+export const setPassword = (password: string, token: string) =>
+  api.post('/api/customer/auth/set-password', { password }, { headers: { Authorization: `Bearer ${token}` } })
+
 export const getMe = () =>
   api.get('/api/customer/me')
 
