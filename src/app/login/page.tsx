@@ -135,7 +135,7 @@ export default function LoginPage() {
               <form onSubmit={handleSendOTP} className="flex flex-col gap-4">
                 <div>
                   <h2 className="font-display font-bold text-xl mb-1">Accedi o registrati</h2>
-                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>Ti mandiamo un codice via email, nessuna password.</p>
+                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>Inserisci la tua email — se non hai un account lo creiamo subito. Nessuna password.</p>
                 </div>
                 <input
                   type="email"

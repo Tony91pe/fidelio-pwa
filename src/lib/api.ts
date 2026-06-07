@@ -99,6 +99,9 @@ export const updateCustomer = (data: { name?: string; birthday?: string }, token
 export const shopSendOTP = (email: string) =>
   shopApi.post('/api/shop/auth/send-otp', { email })
 
+export const shopRegister = (data: { email: string; shopName: string; category: string; city: string }) =>
+  shopApi.post('/api/shop/auth/register', data)
+
 export const shopVerifyOTP = (email: string, code: string) =>
   shopApi.post('/api/shop/auth/verify-otp', { email, code })
 
