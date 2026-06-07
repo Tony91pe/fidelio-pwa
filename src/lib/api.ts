@@ -95,6 +95,16 @@ export const checkinShop = (name: string, email: string, shopId: string) =>
 export const updateCustomer = (data: { name?: string; birthday?: string }, token: string) =>
   api.post('/api/app/customer/update', data, { headers: { Authorization: `Bearer ${token}` } })
 
+export const deleteAccount = (token: string) =>
+  api.delete('/api/app/customer/me', { headers: { Authorization: `Bearer ${token}` } })
+
+export const exportMyData = (token: string) =>
+  api.get('/api/app/customer/me', {
+    params: { format: 'export' },
+    headers: { Authorization: `Bearer ${token}` },
+    responseType: 'blob',
+  })
+
 // ─── Shop Auth ───────────────────────────────────────────────────────────────
 export const shopSendOTP = (email: string) =>
   shopApi.post('/api/shop/auth/send-otp', { email })

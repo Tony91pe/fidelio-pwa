@@ -2,9 +2,9 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { useShopAuthStore } from '@/store/shopAuthStore'
-import { getShopStats } from '@/lib/api'
+import { getShopStats, getShopRewards } from '@/lib/api'
 import { ShopProtectedLayout } from '@/components/ShopProtectedLayout'
-import { ShopStats, ShopCheckin } from '@/types'
+import { ShopStats, ShopCheckin, ShopReward } from '@/types'
 import Link from 'next/link'
 
 function StatCard({ label, value, sub, color }: { label: string; value: string | number; sub?: string; color: string }) {
@@ -60,6 +60,14 @@ export default function ShopDashboard() {
     refetchInterval: 30_000,
   })
 
+  const { data: rewards = [] } = useQuery<ShopReward[]>({
+    queryKey: ['shop-rewards'],
+    queryFn: () => getShopRewards().then((r) => r.data),
+  })
+
+  const profileComplete = !!(shop?.name && shop?.address && shop?.city && shop?.category)
+  const setupDone = profileComplete && rewards.length > 0
+
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Buongiorno' : hour < 18 ? 'Buon pomeriggio' : 'Buonasera'
 
@@ -86,6 +94,27 @@ export default function ShopDashboard() {
           </Link>
         </div>
 
+        {/* Onboarding banner */}
+        {!setupDone && (
+          <Link href="/negozio/onboarding">
+            <div
+              className="rounded-2xl px-4 py-3.5 mb-5 flex items-center gap-3"
+              style={{
+                background: 'rgba(245,158,11,0.07)',
+                border: '1px solid rgba(245,158,11,0.2)',
+                animation: 'slideUp 0.4s cubic-bezier(0.16,1,0.3,1) 0.04s both',
+              }}
+            >
+              <div className="text-2xl flex-shrink-0">🚀</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold" style={{ color: '#F59E0B' }}>Completa il setup</p>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Segui i passaggi per andare live con Fidelio</p>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(245,158,11,0.6)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </Link>
+        )}
+
         {/* Quick Actions */}
         <div
           className="relative rounded-3xl overflow-hidden mb-6 p-5"
@@ -97,9 +126,10 @@ export default function ShopDashboard() {
         >
           <div className="absolute top-0 right-0 w-40 h-40 rounded-full pointer-events-none" style={{ background: 'rgba(16,185,129,0.1)', filter: 'blur(40px)', transform: 'translate(30%,-30%)' }} />
           <p className="text-xs font-medium mb-4" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Azioni rapide</p>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-4 gap-3">
             {[
               { href: '/negozio/scanner', icon: '📷', label: 'Scansiona' },
+              { href: '/negozio/qr', icon: '🔳', label: 'QR Negozio' },
               { href: '/negozio/gift-card', icon: '🎁', label: 'Gift Card' },
               { href: '/negozio/premi', icon: '🏆', label: 'Premi' },
             ].map(({ href, icon, label }) => (

@@ -1,10 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { ProtectedLayout } from '@/components/ProtectedLayout'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { getShops } from '@/lib/api'
+import { getShops, updateCustomer, deleteAccount, exportMyData } from '@/lib/api'
 import { CustomerShop } from '@/types'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import Link from 'next/link'
@@ -27,6 +28,65 @@ export default function ProfiloPage() {
   const { customer, logout } = useAuthStore()
   const router = useRouter()
   const { subscribed, subscribe, unsubscribe, loading, error, permission } = usePushNotifications()
+  const [editOpen, setEditOpen] = useState(false)
+  const [editName, setEditName] = useState(customer?.name || '')
+  const [editBirthday, setEditBirthday] = useState(customer?.birthday?.split('T')[0] || '')
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
+  const [exporting, setExporting] = useState(false)
+
+  async function handleExportData() {
+    setExporting(true)
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('fidelio_token') || '' : ''
+      const res = await exportMyData(token)
+      const url = URL.createObjectURL(new Blob([res.data], { type: 'application/json' }))
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `fidelio-dati-personali-${new Date().toISOString().slice(0, 10)}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      // silently fail
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  async function handleDeleteAccount() {
+    setDeleting(true)
+    setDeleteError('')
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('fidelio_token') || '' : ''
+      await deleteAccount(token)
+      logout()
+      router.replace('/login')
+    } catch {
+      setDeleteError('Errore durante la cancellazione. Riprova o contatta il supporto.')
+      setDeleting(false)
+    }
+  }
+
+  async function handleSaveProfile(e: React.FormEvent) {
+    e.preventDefault()
+    setSaving(true)
+    setSaveError('')
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('fidelio_token') || '' : ''
+      await updateCustomer({ name: editName || undefined, birthday: editBirthday || undefined }, token)
+      setSaveSuccess(true)
+      setEditOpen(false)
+      setTimeout(() => setSaveSuccess(false), 3000)
+    } catch {
+      setSaveError('Errore nel salvataggio. Riprova.')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   const { data: shops = [] } = useQuery({
     queryKey: ['customer-shops', customer?.email],
@@ -92,7 +152,14 @@ export default function ProfiloPage() {
 
             {/* Name + email */}
             <h1 className="font-display font-bold text-2xl leading-tight mb-0.5">{customer?.name}</h1>
-            <p className="text-sm mb-3" style={{ color: 'rgba(255,255,255,0.35)' }}>{customer?.email}</p>
+            <p className="text-sm mb-1" style={{ color: 'rgba(255,255,255,0.35)' }}>{customer?.email}</p>
+            <button
+              onClick={() => { setEditName(customer?.name || ''); setEditBirthday(customer?.birthday?.split('T')[0] || ''); setEditOpen(true) }}
+              className="text-xs font-semibold px-3 py-1 rounded-full mb-3"
+              style={{ background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.22)', color: '#A78BFA' }}
+            >
+              ✏️ Modifica profilo
+            </button>
 
             {/* Tier badge */}
             <span
@@ -198,7 +265,7 @@ export default function ProfiloPage() {
           </div>
         </div>
 
-        {/* Logout */}
+        {/* Logout + Elimina */}
         <div className="px-5">
           <button
             onClick={handleLogout}
@@ -207,9 +274,152 @@ export default function ProfiloPage() {
           >
             Esci dall&apos;account
           </button>
-          <p className="text-center text-xs mt-5" style={{ color: 'rgba(255,255,255,0.1)', letterSpacing: '0.05em' }}>Fidelio · Made with ♥ in Italy</p>
+          <button
+            onClick={handleExportData}
+            disabled={exporting}
+            className="w-full py-3 mt-3 rounded-2xl text-xs font-medium"
+            style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.25)', opacity: exporting ? 0.5 : 1 }}
+          >
+            {exporting ? 'Preparazione file...' : '⬇️ Scarica i miei dati (GDPR)'}
+          </button>
+          <button
+            onClick={() => setDeleteOpen(true)}
+            className="w-full py-2 rounded-2xl text-xs font-medium"
+            style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.15)' }}
+          >
+            Elimina account e dati personali
+          </button>
+          <p className="text-center text-xs mt-2" style={{ color: 'rgba(255,255,255,0.1)', letterSpacing: '0.05em' }}>Fidelio · Made with ♥ in Italy</p>
         </div>
       </div>
+
+      {/* Modale conferma eliminazione account */}
+      {deleteOpen && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 50, display: 'flex', alignItems: 'flex-end', backdropFilter: 'blur(4px)' }}
+          onClick={(e) => { if (e.target === e.currentTarget) setDeleteOpen(false) }}
+        >
+          <div style={{ width: '100%', background: '#1A1A2E', borderRadius: '24px 24px 0 0', padding: '1.5rem', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>⚠️</div>
+              <h2 style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: '0.5rem' }}>Elimina account</h2>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', lineHeight: '1.6' }}>
+                Questa azione è <strong style={{ color: '#F87171' }}>irreversibile</strong>. Verranno eliminati tutti i tuoi punti, lo storico visite e i dati personali da tutti i negozi Fidelio.
+              </p>
+            </div>
+            {deleteError && (
+              <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 12, padding: '0.75rem', marginBottom: '1rem' }}>
+                <p style={{ color: '#F87171', fontSize: '0.85rem', textAlign: 'center' }}>{deleteError}</p>
+              </div>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleting}
+                style={{ width: '100%', padding: '0.9rem', borderRadius: 14, border: 'none', cursor: 'pointer', background: 'rgba(239,68,68,0.85)', color: 'white', fontWeight: 700, fontSize: '0.95rem', opacity: deleting ? 0.6 : 1 }}
+              >
+                {deleting ? 'Eliminazione in corso...' : 'Sì, elimina il mio account'}
+              </button>
+              <button
+                onClick={() => { setDeleteOpen(false); setDeleteError('') }}
+                disabled={deleting}
+                style={{ width: '100%', padding: '0.9rem', borderRadius: 14, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.5)', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}
+              >
+                Annulla
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Save success toast */}
+      {saveSuccess && (
+        <div
+          style={{
+            position: 'fixed', bottom: '6rem', left: '50%', transform: 'translateX(-50%)',
+            background: 'rgba(16,185,129,0.9)', color: 'white', padding: '0.75rem 1.5rem',
+            borderRadius: 12, fontWeight: 600, fontSize: '0.9rem', zIndex: 100,
+            backdropFilter: 'blur(12px)', boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+          }}
+        >
+          ✅ Profilo aggiornato!
+        </div>
+      )}
+
+      {/* Edit profile modal */}
+      {editOpen && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 50,
+            display: 'flex', alignItems: 'flex-end', backdropFilter: 'blur(4px)',
+          }}
+          onClick={(e) => { if (e.target === e.currentTarget) setEditOpen(false) }}
+        >
+          <div
+            style={{
+              width: '100%', background: '#1A1A2E', borderRadius: '24px 24px 0 0',
+              padding: '1.5rem', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontWeight: 700, fontSize: '1.1rem' }}>Modifica profilo</h2>
+              <button
+                onClick={() => setEditOpen(false)}
+                style={{ width: 32, height: 32, borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: 'none', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.45)', display: 'block', marginBottom: '0.4rem', fontWeight: 500 }}>
+                  Nome e cognome
+                </label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="Il tuo nome completo"
+                  required
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: '0.75rem', color: 'rgba(167,139,250,0.8)', display: 'block', marginBottom: '0.4rem', fontWeight: 600 }}>
+                  🎂 Data di nascita
+                </label>
+                <input
+                  type="date"
+                  value={editBirthday}
+                  onChange={(e) => setEditBirthday(e.target.value)}
+                />
+                <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)', marginTop: '0.35rem' }}>
+                  Riceverai un regalo a sorpresa nel giorno del tuo compleanno 🎁
+                </p>
+              </div>
+
+              {saveError && (
+                <p style={{ color: '#F87171', fontSize: '0.85rem' }}>{saveError}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={saving}
+                style={{
+                  width: '100%', padding: '0.9rem', borderRadius: 14, border: 'none', cursor: 'pointer',
+                  background: 'linear-gradient(135deg, #7C3AED, #3B82F6)',
+                  color: 'white', fontWeight: 700, fontSize: '1rem',
+                  boxShadow: '0 6px 20px rgba(124,58,237,0.4)',
+                  opacity: saving ? 0.7 : 1,
+                }}
+              >
+                {saving ? 'Salvataggio...' : 'Salva modifiche'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </ProtectedLayout>
   )
 }

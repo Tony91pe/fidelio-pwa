@@ -10,10 +10,8 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.51.1",
-    "@tanstack/react-query-devtools": "^5.51.1",
     "@types/jsonwebtoken": "^9.0.10",
     "axios": "^1.7.2",
-    "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "jsonwebtoken": "^9.0.3",
     "jsqr": "^1.4.0",
