@@ -83,12 +83,13 @@ export default function OnboardingPage() {
 
           <div>
             <label className="text-xs font-medium block mb-1.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              Data di nascita <span style={{ color: 'rgba(255,255,255,0.25)' }}>— ricevi un regalo il giorno del tuo compleanno 🎁</span>
+              Data di nascita * <span style={{ color: '#A78BFA' }}>— ricevi un regalo il giorno del tuo compleanno 🎁</span>
             </label>
             <input
               type="date"
               value={birthday}
               onChange={e => setBirthday(e.target.value)}
+              required
               style={{ ...inputStyle, colorScheme: 'dark' }}
             />
           </div>
@@ -106,14 +107,6 @@ export default function OnboardingPage() {
             {loading ? 'Salvataggio...' : 'Inizia a raccogliere punti →'}
           </button>
 
-          <button
-            type="button"
-            onClick={() => router.replace('/')}
-            className="text-sm text-center"
-            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.25)', cursor: 'pointer' }}
-          >
-            Salta per ora
-          </button>
         </form>
       </div>
     </div>
